@@ -11,7 +11,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="relative bg-gray-900 text-white bg-cover bg-center max-sm:bg-contain" style={{ backgroundImage: "url('https://efwdhmhuwgtmfaqbomnl.supabase.co/storage/v1/object/public/perfumes/hero-bg.jpg')" }}>
+      <section className="relative bg-gray-900 text-white bg-cover bg-center max-sm:bg-contain bg-no-repeat" style={{ backgroundImage: "url('https://efwdhmhuwgtmfaqbomnl.supabase.co/storage/v1/object/public/perfumes/hero-bg.jpg')" }}>
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative max-w-7xl mx-auto px-4 py-20 max-sm:py-14 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-4">SYNAPSE DIGITAL</h1>
