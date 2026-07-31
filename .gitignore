@@ -32,9 +32,16 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# scraping artifacts (imágenes ya están en Supabase Storage)
+downloaded_images/
+
+# imágenes locales (redundantes: todas las URLs apuntan a Supabase Storage)
+public/images/
 
 # typescript
 *.tsbuildinfo

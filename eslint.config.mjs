@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Scripts de migración/scraping (no parte de la app)
+    "scrape.js",
+    "scripts/**",
+    "downloaded_images/**",
   ]),
 ]);
 

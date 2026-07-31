@@ -1,0 +1,110 @@
+[
+  {
+    "description": "Perfumes masculinos",
+    "id": 1,
+    "name": "Masculinos",
+    "slug": "masculinos"
+  },
+  {
+    "description": "Perfumes femeninos",
+    "id": 2,
+    "name": "Femeninos",
+    "slug": "femeninos"
+  },
+  {
+    "description": "Perfumes unisex",
+    "id": 3,
+    "name": "Unisex",
+    "slug": "unisex"
+  },
+  {
+    "description": "Cosméticos FIDELITE",
+    "id": 4,
+    "name": "FIDELITE",
+    "slug": "fidelite"
+  },
+  {
+    "description": "Cosméticos KLASSE",
+    "id": 5,
+    "name": "KLASSE",
+    "slug": "klasse"
+  },
+  {
+    "description": "Cosméticos L'ORÉAL",
+    "id": 6,
+    "name": "L'ORÉAL",
+    "slug": "loreal"
+  },
+  {
+    "description": "Cosméticos FOREVERLISS",
+    "id": 7,
+    "name": "FOREVERLISS",
+    "slug": "foreverliss"
+  },
+  {
+    "description": "Cosméticos ZAP",
+    "id": 8,
+    "name": "ZAP",
+    "slug": "zap"
+  },
+  {
+    "description": "Cosméticos MAGIC 3D",
+    "id": 9,
+    "name": "MAGIC 3D",
+    "slug": "magic-3d"
+  },
+  {
+    "description": "Cosméticos KERASYS",
+    "id": 10,
+    "name": "KERASYS",
+    "slug": "kerasys"
+  },
+  {
+    "description": "Cosméticos LISHAIMI",
+    "id": 11,
+    "name": "LISHAIMI",
+    "slug": "lishaimi"
+  },
+  {
+    "description": "Cosméticos BENDITA TU ERES",
+    "id": 12,
+    "name": "BENDITA TU ERES",
+    "slug": "bendita-tu-eres"
+  },
+  {
+    "description": "Cosméticos LESSENCE",
+    "id": 13,
+    "name": "LESSENCE",
+    "slug": "lessence"
+  },
+  {
+    "description": "Cosméticos ALFAPARF",
+    "id": 14,
+    "name": "ALFAPARF",
+    "slug": "alfaparf"
+  },
+  {
+    "description": "Cosméticos REVLON",
+    "id": 15,
+    "name": "REVLON",
+    "slug": "revlon"
+  },
+  {
+    "description": "Cosméticos KARSEELL",
+    "id": 16,
+    "name": "KARSEELL",
+    "slug": "karseell"
+  },
+  {
+    "description": "Cosméticos ISSUE",
+    "id": 17,
+    "name": "ISSUE",
+    "slug": "issue"
+  },
+  {
+    "description": "Cosméticos NOV",
+    "id": 18,
+    "name": "NOV",
+    "slug": "nov"
+  }
+]

@@ -1,0 +1,124 @@
+==========================================================
+ CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
+==========================================================
+Última actualización: 2026-07-29
+
+========================  DATOS DEL PROYECTO ========================
+
+Brand: SYNAPSE DIGITAL
+WhatsApp: +595985798538
+Moneda: Guaraníes (Gs)
+
+Supabase URL: https://efwdhmhuwgtmfaqbomnl.supabase.co
+Supabase Anon Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmd2RobWh1d2d0bWZhcWJvbW5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMTM1NTYsImV4cCI6MjEwMDg4OTU1Nn0.QFZuxorr_3E-oLySPP-QwHa_04BKJauOl6NfmrVJCqQ
+Supabase Service Role Key: (no disponible, fue rotada — pedir nueva en Dashboard > Settings > API)
+Supabase Project ID: efwdhmhuwgtmfaqbomnl
+
+Storage bucket: perfumes (imágenes en /perfumes/products/)
+Tablas: categories (18 filas), products (222 filas)
+
+Dominio original scrapeado: https://www.cosmeking-py.com/mayoristas
+API original: /public/products, /public/categories, /public/products/{id}
+
+========================  ESTRUCTURA DEL PROYECTO ========================
+
+Framework: Next.js 16.2.12 + Tailwind CSS v4 + TypeScript
+Store: Zustand (carrito persistido en localStorage)
+
+src/
+├── app/
+│   ├── page.tsx              → Home (hero con bg image, categorías, destacados)
+│   ├── cart/page.tsx          → Carrito (cantidades, total, WhatsApp checkout)
+│   ├── products/
+│   │   ├── page.tsx           → Server wrapper
+│   │   └── content.tsx        → Cliente con búsqueda y filtro por categoría
+│   ├── category/[slug]/page.tsx → Productos por categoría
+│   └── product/[id]/page.tsx  → Detalle del producto (volumen, add-to-cart, WhatsApp)
+├── components/
+│   ├── Header.tsx             → Logo + nombre, categorías, búsqueda, carrito
+│   ├── ProductCard.tsx        → Card de producto (precio con markup, imagen)
+│   ├── Footer.tsx
+│   └── WhatsAppButton.tsx
+├── lib/
+│   ├── data.ts                → Data layer: consultas a Supabase + calculateSalePrice()
+│   ├── supabase.ts            → Cliente Supabase
+│   └── types.ts               → Interfaces (Product, Category, CartItem, VolumeOption)
+└── store/
+    └── cart.ts                → Zustand store con persistencia localStorage
+
+scripts/
+├── seed-http.mjs              → Script de migración a Supabase (usa env vars)
+└── generate-descriptions.mjs  → Genera SQL de descripciones para productos
+
+Archivos JSON originales (data scrapeada):
+├── perfumes.json              → Data completa scrapeada
+├── perfumes_compact.json      → Solo perfumes (222 items)
+├── raw_products.json          → 281 productos raw
+├── categories.json            → 18 categorías
+├── src/data/perfumes.json     → Copia en src
+└── src/data/categories.json   → Copia en src
+
+Imágenes:
+├── public/images/*.jpg        → 252 imágenes de productos
+├── public/hero-bg.jpg         → Imagen de fondo del hero (generada por IA, 1920x640)
+└── public/logo.png            → Logo de SYNAPSE DIGITAL
+
+SQL de actualización:
+├── update_descripciones.sql   → 185 UPDATEs para descripciones (✓ ejecutado)
+
+========================  FUNCIONALIDADES IMPLEMENTADAS ========================
+
+[✓] Home con hero, categorías (solo 3: Masculinos, Femeninos, Unisex) y destacados
+[✓] Catálogo completo con búsqueda por nombre/marca
+[✓] Filtro por categoría
+[✓] Detalle de producto con:
+    - Selección de volumen (ml)
+    - Precio con markup automático (ganancia 80.000-120.000 Gs según costo)
+    - Precios redondeados a 000 o 5000
+    - Descripción del producto (formato HTML con <ul><li>)
+    - Botón "Agregar al Carrito" + feedback visual
+    - Botón "WhatsApp" con mensaje predefinido
+[✓] Carrito (Zustand + localStorage):
+    - Agregar/quitar items
+    - Actualizar cantidades
+    - Vaciar carrito
+    - Total calculado
+    - Enviar pedido por WhatsApp
+[✓] WhatsApp flotante en todas las páginas
+[✓] Header responsive con menú hamburguesa
+[✓] Datos desde Supabase en vivo (no JSON estático)
+[✓] Imágenes desde Supabase Storage (URLs completas)
+[✓] Logo en el header
+
+========================  LÓGICA DE NEGOCIO ========================
+
+PRECIOS:
+- Se toma price_wholesale (precio de costo) de Supabase
+- Se calcula markup entre 80.000 y 120.000 Gs (proporcional al costo)
+- Se redondea a múltiplo de 5.000 (termina en 000 o 5000)
+- Función: calculateSalePrice() en src/lib/data.ts
+
+CATEGORÍAS:
+- Solo se muestran las 3 categorías de perfumes: Masculinos (1), Femeninos (2), Unisex (3)
+- Las categorías 4-18 (cosméticos) se excluyen del frontend
+
+IMÁGENES:
+- ProductCard, detalle, carrito: detectan si la URL empieza con http (Supabase)
+  o es relativa (carpeta /images/ local)
+
+DESCRIPCIONES:
+- Generadas automáticamente con formato <ul><li>
+- Basadas en nombre, marca y categoría
+- 185 pendientes de ejecutar en SQL Editor de Supabase
+
+========================  PENDIENTE ========================
+
+[ ] Ejecutar update_descripciones.sql en SQL Editor de Supabase
+[ ] Subir a GitHub
+[ ] Desplegar en Vercel (variables de entorno: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
+[ ] Opcional: dominio propio
+[ ] Opcional: Google Analytics o similar
+[ ] Opcional: SEO (metadatos, sitemap)
+[ ] Opcional: PWA
+
+==========================================================
