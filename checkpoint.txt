@@ -108,7 +108,7 @@ Archivos JSON originales (data scrapeada):
 
 PRECIOS:
 - Se toma price_wholesale (costo) de Supabase
-- Markup entre 80.000 y 120.000 Gs (proporcional al costo)
+- Markup entre 70.000 y 100.000 Gs (proporcional al costo)
 - Redondeo a múltiplo de 5.000 (termina en 000 o 5000)
 - Función: calculateSalePrice() en src/lib/data.ts
 
