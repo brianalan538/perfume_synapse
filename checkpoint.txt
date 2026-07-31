@@ -150,10 +150,32 @@ Notas Node:
 [✓] Escaneo de secretos: no hay SERVICE_ROLE_KEY ni ADMIN_PASSWORD en git.
 [✓] Home ahora es force-dynamic (refleja cambios del admin al instante).
 
+======================  INCIDENTE: PROD SIN PRODUCTOS (2026-07-31) =======================
+
+DIAGNOSTICADO via /api/diag (commit aed5e83, RUTA TEMPORAL):
+- El valor de NEXT_PUBLIC_SUPABASE_ANON_KEY en Vercel tenía PEGADA la línea
+  siguiente del archivo (ADMIN_PASSWORD=...) por pegar el .env completo.
+  -> Anon key 238 chars (debe ser 208). El \n en el header invalidaba la
+     request -> todas las consultas Supabase fallaban -> productos vacíos.
+- CONSECUENCIA DE SEGURIDAD: ADMIN_PASSWORD quedó visible en el bundle
+  público del deploy. POR ESO SE ROTÓ (ver .env.local, nuevo valor).
+  El valor nuevo YA NO debe ir en NEXT_PUBLIC_* de Vercel.
+
+FIX EN VERCEL (Project Settings > Environment Variables):
+  1. NEXT_PUBLIC_SUPABASE_ANON_KEY = SOLO el JWT de 208 chars de .env.local
+     (sin la línea de ADMIN_PASSWORD pegada).
+  2. ADMIN_PASSWORD = el valor NUEVO del .env.local (cambiado).
+  3. Verificar SUPABASE_SERVICE_ROLE_KEY = solo la key (219 chars).
+  4. Redeploy (botón Redeploy o push a main).
+  5. Verificar con https://perfume-synapse.vercel.app/api/diag
+     (debe mostrar anonLength 208 y sin error). LUEGO BORRAR /api/diag.
+
 ======================  PENDIENTE =======================
 
-[ ] Confirmar deploy exitoso en Vercel (la app debe abrir y mostrar productos)
+[ ] Aplicar fix de env vars en Vercel (ver INCIDENTE arriba) + redeploy
+[ ] Confirmar deploy OK en Vercel (home debe mostrar productos)
 [ ] Revisar /admin en producción (login + crear/editar/ocultar un producto)
+[ ] BORRAR src/app/api/diag/route.ts cuando termine el diagnóstico
 [ ] Opcional: dominio propio
 [ ] Opcional: Google Analytics o similar
 [ ] Opcional: SEO (metadatos, sitemap, robots.txt)
