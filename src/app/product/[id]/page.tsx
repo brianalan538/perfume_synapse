@@ -89,9 +89,16 @@ export default function ProductDetailPage() {
         </div>
 
         <div>
-          {product.brand && (
-            <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">{product.brand}</span>
-          )}
+          <div className="flex items-center gap-3 mb-1">
+            {product.brand && (
+              <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">{product.brand}</span>
+            )}
+            {product.category_name && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-[#7c3aed]/10 text-[#7c3aed] uppercase tracking-wide">
+                {product.category_name}
+              </span>
+            )}
+          </div>
           <h1 className="text-2xl md:text-3xl font-bold text-[#0f0f1a] mt-1 mb-4">{product.name}</h1>
 
           <div className="mb-6">
