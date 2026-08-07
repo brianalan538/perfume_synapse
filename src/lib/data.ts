@@ -3,8 +3,8 @@ import type { Product, Category, VolumeOption } from './types';
 
 const PERFUME_CATEGORY_IDS = [1, 2, 3];
 
-const MIN_MARKUP = 70000;
-const MAX_MARKUP = 100000;
+const MIN_MARKUP = 60000;
+const MAX_MARKUP = 90000;
 
 export function calculateSalePrice(wholesale: number): number {
   if (wholesale <= 0) return 0;
