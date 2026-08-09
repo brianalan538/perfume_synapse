@@ -50,6 +50,7 @@ export default function ProductDetailPage() {
     : (product.price_wholesale > 0 ? product.price_wholesale : product.price);
 
   const currentPrice = calculateSalePrice(wholesalePrice);
+  const isConsult = currentPrice <= 0;
 
   function handleAddToCart() {
     if (!product) return;
@@ -72,7 +73,11 @@ export default function ProductDetailPage() {
     let msg = `¡Hola! Quiero comprar:\n\n${product.name}`;
     if (product.brand) msg += ` - ${product.brand}`;
     if (selectedVolume) msg += ` (${selectedVolume.ml}ml)`;
-    msg += `\nPrecio: ${currentPrice.toLocaleString()} Gs.\n\n¿Está disponible?`;
+    if (isConsult) {
+      msg += `\n\n¿Cuál es el precio de este producto?`;
+    } else {
+      msg += `\nPrecio: ${currentPrice.toLocaleString()} Gs.\n\n¿Está disponible?`;
+    }
     return encodeURIComponent(msg);
   }
 
@@ -102,7 +107,11 @@ export default function ProductDetailPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-[#0f0f1a] mt-1 mb-4">{product.name}</h1>
 
           <div className="mb-6">
-            <span className="text-3xl font-bold text-[#7c3aed]">{currentPrice.toLocaleString()} Gs.</span>
+            {isConsult ? (
+              <span className="text-3xl font-bold text-[#7c3aed]">Consultar</span>
+            ) : (
+              <span className="text-3xl font-bold text-[#7c3aed]">{currentPrice.toLocaleString()} Gs.</span>
+            )}
           </div>
 
           {product.volume_options.length > 0 && (
@@ -112,6 +121,7 @@ export default function ProductDetailPage() {
                 {product.volume_options.map((vo, i) => {
                   const wholesale = vo.price_wholesale > 0 ? vo.price_wholesale : vo.price;
                   const voPrice = calculateSalePrice(wholesale);
+                  const label = voPrice > 0 ? `${vo.ml}ml - ${voPrice.toLocaleString()} Gs.` : `${vo.ml}ml`;
                   return (
                     <button
                       key={i}
@@ -122,7 +132,7 @@ export default function ProductDetailPage() {
                           : 'border-gray-300 text-gray-700 hover:border-[#7c3aed]'
                       }`}
                     >
-                      {vo.ml}ml - {voPrice.toLocaleString()} Gs.
+                      {label}
                     </button>
                   );
                 })}
@@ -131,13 +141,27 @@ export default function ProductDetailPage() {
           )}
 
           <div className="flex gap-3">
-            <button onClick={handleAddToCart} className="flex-1 bg-[#7c3aed] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#6d28d9] transition-colors flex items-center justify-center gap-2">
-              {added ? <><Check size={20} /> Agregado</> : <><ShoppingCart size={20} /> Agregar al Carrito</>}
-            </button>
-            <a href={`https://wa.me/${PHONE}?text=${whatsappMessage()}`} target="_blank" rel="noopener noreferrer" className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2">
-              <MessageCircle size={20} />
-              <span className="hidden md:inline">WhatsApp</span>
-            </a>
+            {isConsult ? (
+              <a
+                href={`https://wa.me/${PHONE}?text=${whatsappMessage()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-[#7c3aed] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#6d28d9] transition-colors flex items-center justify-center gap-2"
+              >
+                <MessageCircle size={20} />
+                Consultar por WhatsApp
+              </a>
+            ) : (
+              <>
+                <button onClick={handleAddToCart} className="flex-1 bg-[#7c3aed] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#6d28d9] transition-colors flex items-center justify-center gap-2">
+                  {added ? <><Check size={20} /> Agregado</> : <><ShoppingCart size={20} /> Agregar al Carrito</>}
+                </button>
+                <a href={`https://wa.me/${PHONE}?text=${whatsappMessage()}`} target="_blank" rel="noopener noreferrer" className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2">
+                  <MessageCircle size={20} />
+                  <span className="hidden md:inline">WhatsApp</span>
+                </a>
+              </>
+            )}
           </div>
 
           {product.description && (

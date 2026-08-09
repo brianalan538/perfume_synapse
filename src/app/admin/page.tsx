@@ -304,6 +304,7 @@ export default function AdminPage() {
             {filtered.map(product => {
               const wholesale = product.price_wholesale > 0 ? product.price_wholesale : product.price;
               const price = calculateSalePrice(wholesale);
+              const isConsult = price <= 0;
               const imgSrc = getImgSrc(product);
 
               return (
@@ -312,6 +313,9 @@ export default function AdminPage() {
                     <img src={imgSrc} alt={product.name} className="w-full h-full object-contain p-4 transition-transform" loading="lazy" />
                     {product.brand && (
                       <span className="absolute top-2 left-2 bg-[#7c3aed] text-white text-xs font-medium px-2 py-1 rounded">{product.brand}</span>
+                    )}
+                    {isConsult && !product.is_active && (
+                      <span className="absolute top-2 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">Consultar</span>
                     )}
                     {!product.is_active && (
                       <span className="absolute top-2 left-1/2 -translate-x-1/2 bg-gray-800/80 text-white text-xs font-medium px-2 py-1 rounded">Oculto</span>
@@ -348,7 +352,7 @@ export default function AdminPage() {
                   <div className="p-4">
                     <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">{product.name}</h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-[#7c3aed]">{price.toLocaleString()} Gs.</span>
+                      <span className="text-lg font-bold text-[#7c3aed]">{isConsult ? 'Consultar' : `${price.toLocaleString()} Gs.`}</span>
                       <span className="text-[10px] text-gray-400">ID {product.id}</span>
                     </div>
                   </div>

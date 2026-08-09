@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check, MessageCircle } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { calculateSalePrice } from '@/lib/data';
 import { useCart } from '@/store/cart';
+
+const PHONE = '595985798538';
 
 interface Props {
   product: Product;
@@ -24,6 +26,11 @@ export default function ProductCard({ product }: Props) {
     ? (volumeOption.price_wholesale > 0 ? volumeOption.price_wholesale : volumeOption.price)
     : (product.price_wholesale > 0 ? product.price_wholesale : product.price);
   const price = calculateSalePrice(wholesale);
+  const isConsult = price <= 0;
+
+  const consultMessage = encodeURIComponent(
+    `¡Hola! Quiero consultar por el precio de:\n\n${product.name}${product.brand ? ` - ${product.brand}` : ''}\n\n¿Está disponible?`
+  );
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -64,17 +71,42 @@ export default function ProductCard({ product }: Props) {
         <div className="p-4">
           <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">{product.name}</h3>
           <div>
-            <span className="text-lg font-bold text-[#7c3aed]">{price.toLocaleString()} Gs.</span>
+            {isConsult ? (
+              <a
+                href={`https://wa.me/${PHONE}?text=${consultMessage}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="inline-flex items-center gap-1 text-lg font-bold text-[#7c3aed] hover:underline"
+              >
+                Consultar
+              </a>
+            ) : (
+              <span className="text-lg font-bold text-[#7c3aed]">{price.toLocaleString()} Gs.</span>
+            )}
           </div>
         </div>
       </Link>
-      <button
-        onClick={handleQuickAdd}
-        className="absolute top-2 right-2 w-9 h-9 rounded-full bg-[#7c3aed] text-white flex items-center justify-center hover:bg-[#6d28d9] transition-colors shadow-md"
-        title="Agregar al carrito"
-      >
-        {addedId === product.id ? <Check size={16} /> : <ShoppingCart size={16} />}
-      </button>
+      {isConsult ? (
+        <a
+          href={`https://wa.me/${PHONE}?text=${consultMessage}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+          className="absolute top-2 right-2 w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center hover:bg-green-700 transition-colors shadow-md"
+          title="Consultar por WhatsApp"
+        >
+          <MessageCircle size={16} />
+        </a>
+      ) : (
+        <button
+          onClick={handleQuickAdd}
+          className="absolute top-2 right-2 w-9 h-9 rounded-full bg-[#7c3aed] text-white flex items-center justify-center hover:bg-[#6d28d9] transition-colors shadow-md"
+          title="Agregar al carrito"
+        >
+          {addedId === product.id ? <Check size={16} /> : <ShoppingCart size={16} />}
+        </button>
+      )}
     </div>
   );
 }

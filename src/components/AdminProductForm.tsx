@@ -39,7 +39,7 @@ export default function AdminProductForm({ mode, initial, categories, password, 
     setDraft(prev => ({ ...prev, volumes: prev.volumes.filter((_, i) => i !== index) }));
   }
 
-  const volumes = draft.volumes.filter(v => v.ml > 0 && v.price_wholesale > 0);
+  const volumes = draft.volumes.filter(v => v.ml > 0);
   const previewWholesale =
     (volumes.length > 0 && volumes[0].price_wholesale > 0 ? volumes[0].price_wholesale : 0) ||
     (draft.price_wholesale > 0 ? draft.price_wholesale : 0);
@@ -48,11 +48,13 @@ export default function AdminProductForm({ mode, initial, categories, password, 
   function buildPayload(): ProductPayload {
     const volumeOptions = volumes.map(v => ({
       ml: Number(v.ml),
-      price: calculateSalePrice(Number(v.price_wholesale)),
-      price_wholesale: Number(v.price_wholesale),
+      price: v.price_wholesale > 0 ? calculateSalePrice(Number(v.price_wholesale)) : 0,
+      price_wholesale: Number(v.price_wholesale) || 0,
       stock: Number(v.stock) || 0,
     }));
-    const mainWholesale = volumeOptions.length > 0 ? volumeOptions[0].price_wholesale : (draft.price_wholesale || 0);
+    const mainWholesale = volumeOptions.length > 0 && volumeOptions[0].price_wholesale
+      ? volumeOptions[0].price_wholesale
+      : draft.price_wholesale || 0;
     const image = draft.image_url.trim();
     return {
       name: draft.name.trim(),
@@ -317,8 +319,10 @@ export default function AdminProductForm({ mode, initial, categories, password, 
 
           <div className="bg-[#f5f3ff] rounded-xl p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Precio de venta calculado</span>
-              <span className="text-2xl font-bold text-[#7c3aed]">{previewSale.toLocaleString()} Gs.</span>
+              <span className="text-sm text-gray-600">{previewSale > 0 ? 'Precio de venta calculado' : 'Precio a consultar'}</span>
+              <span className="text-2xl font-bold text-[#7c3aed]">
+                {previewSale > 0 ? `${previewSale.toLocaleString()} Gs.` : 'Consultar'}
+              </span>
             </div>
           </div>
         </div>
