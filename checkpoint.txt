@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-07-31
+Última actualización: 2026-08-10
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -108,9 +108,29 @@ Archivos JSON originales (data scrapeada):
 
 PRECIOS:
 - Se toma price_wholesale (costo) de Supabase
-- Markup entre 70.000 y 100.000 Gs (proporcional al costo)
+- Markup entre 50.000 y 100.000 Gs (proporcional al costo) [cambiado 2026-08-10,
+  antes era 60.000-90.000, y antes 70.000-100.000]
 - Redondeo a múltiplo de 5.000 (termina en 000 o 5000)
-- Función: calculateSalePrice() en src/lib/data.ts
+- Función: calculateSalePrice() en src/lib/data.ts (y scripts/pricing.js)
+- Aplicado a 220 productos con node scripts/sync-all-prices.js (2026-08-10)
+
+ESTRATEGIA DE PRECIOS (último análisis: 2026-08-10):
+- CAMBIO DE ESTRATEGIA: ahora SE APLICAN los costos del proveedor en TODOS los
+  casos, tanto SUBIDAS como BAJADAS (antes las bajadas se conservaban para ganar
+  más margen). La ganancia se mantiene entre 50.000 y 100.000 Gs por unidad con
+  la fórmula actual.
+- Sync completo del 2026-08-10: 220 productos actualizados (costos del proveedor
+  al día + precios recalculados con markup 50-100k). Verificado con
+  compare-prices: 0 cambios de costo pendientes.
+- Corrección: ANGHAM SECOND SONG (id 183) tenía volume[].price_wholesale = null
+  en el proveedor; el script ahora usa el wholesale del producto (140.000) en
+  vez del price minorista (165.000) como fallback del volumen.
+- 1 sin precio en proveedor (BOTOX WHITE SALON GOLD, id 278, wholesale 0) sin tocar.
+- 5 en Supabase sin match en proveedor (no se tocan): CLUB DE NUIT ICONIC,
+  ODYSSEY HOMME WHITE, 9PM REBEL - AFNAN, LEONIE EDP, RAYHAAN OBSIDIAN.
+- Sin scripts de guardado de bajadas: el flujo nuevo es sync-all-prices.js.
+- Scripts: sync-all-prices.js (sync total), sync-prices.js (alinea campo price),
+  compare-prices.js (comparador), generate-promo-pdf.js (PDF promocional).
 
 CATEGORÍAS:
 - Solo 3 categorías de perfumes: Masculinos (1), Femeninos (2), Unisex (3)
