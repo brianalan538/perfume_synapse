@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
-import ProductCard from '@/components/ProductCard';
+import CategoryContent from './content';
 import { getCategoryBySlug, getProductsByCategory } from '@/lib/data';
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -30,11 +30,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         <p className="text-gray-500 mt-1">{catProducts.length} productos</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {catProducts.map(product => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      <CategoryContent products={catProducts} />
 
       {catProducts.length === 0 && (
         <div className="text-center py-16">
