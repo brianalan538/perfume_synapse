@@ -114,14 +114,23 @@ PRECIOS:
 - Función: calculateSalePrice() en src/lib/data.ts (y scripts/pricing.js)
 - Aplicado a 220 productos con node scripts/sync-all-prices.js (2026-08-10)
 
-ESTRATEGIA DE PRECIOS (último análisis: 2026-08-10):
+ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
 - CAMBIO DE ESTRATEGIA: ahora SE APLICAN los costos del proveedor en TODOS los
   casos, tanto SUBIDAS como BAJADAS (antes las bajadas se conservaban para ganar
   más margen). La ganancia se mantiene entre 50.000 y 100.000 Gs por unidad con
   la fórmula actual.
-- Sync completo del 2026-08-10: 220 productos actualizados (costos del proveedor
-  al día + precios recalculados con markup 50-100k). Verificado con
-  compare-prices: 0 cambios de costo pendientes.
+- IMPORTANTE (2026-08-11): el proveedor pasó a publicar price_wholesale en DÓLARES.
+  scripts/pricing.js convierte USD -> Gs con tipo de cambio 6100 (auto-detección:
+  si price_wholesale <= 500 es USD y se multiplica por 6100; si > 500 ya viene en
+  Gs y se usa tal cual, ej. ASAD BLACK, ANA ABIYEDH, ARMAF MEGA, FANTASY MIDNIGHT).
+  Así el sync sigue funcionando aunque el proveedor vuelva a guaraníes.
+- Sync completo del 2026-08-11: 209 productos actualizados (93 subidas + 110
+  bajadas + ajustes de stock/volúmenes) al costo real del proveedor. Verificado
+  con compare-prices: 0 cambios de costo pendientes. 6 sin cambio (FANTASY
+  MIDNIGHT, ANA ABIYEDH, ARMAF MEGA, KHAMRAH QAHWA, KHAMRAH DUKHAN, ASAD BLACK).
+  1 sin costo en proveedor sin tocar (BOTOX WHITE SALON GOLD) y 16 sin match
+  sin tocar.
+- Modo --dry-run disponible en sync-all-prices.js para previsualizar sin escribir.
 - Corrección: ANGHAM SECOND SONG (id 183) tenía volume[].price_wholesale = null
   en el proveedor; el script ahora usa el wholesale del producto (140.000) en
   vez del price minorista (165.000) como fallback del volumen.

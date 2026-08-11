@@ -11,6 +11,7 @@ const {
   getBaseWholesale,
   getDisplayPrice,
   numOrZero,
+  convertWholesale,
 } = require('./pricing');
 
 const API_BASE = 'https://www.cosmeking-py.com';
@@ -46,7 +47,7 @@ function buildVolumeOptions(dbVols, providerVols, fallbackWholesale) {
     return dbVols.map(v => {
       const ml = Number(v.ml);
       const pv = provByMl.get(ml);
-      const volWholesale = pv ? numOrZero(pv.price_wholesale) : 0;
+      const volWholesale = pv ? convertWholesale(pv.price_wholesale) : 0;
       const volCost = volWholesale > 0 ? volWholesale : fallbackWholesale;
       return {
         ml,
@@ -57,7 +58,7 @@ function buildVolumeOptions(dbVols, providerVols, fallbackWholesale) {
     });
   }
   return (providerVols || []).map(v => {
-    const volWholesale = numOrZero(v.price_wholesale);
+    const volWholesale = convertWholesale(v.price_wholesale);
     const volCost = volWholesale > 0 ? volWholesale : fallbackWholesale;
     return {
       ml: Number(v.ml),
@@ -69,6 +70,9 @@ function buildVolumeOptions(dbVols, providerVols, fallbackWholesale) {
 }
 
 async function main() {
+  const DRY_RUN = process.argv.includes('--dry-run');
+  if (DRY_RUN) console.log('*** MODO DRY-RUN: no se escribe nada en Supabase ***\n');
+
   console.log('1) Descargando productos del proveedor...');
   const allProducts = await fetchJSON(`${API_BASE}/public/products`);
   const provider = allProducts.filter(p => PERFUME_CATEGORY_IDS.includes(Number(p.category_id)));
@@ -109,18 +113,20 @@ async function main() {
     const costChanged = oldCost !== newCost || oldPrice !== newPrice || oldVolsStr !== newVolsStr || numOrZero(d.stock) !== numOrZero(p.stock);
 
     if (costChanged) {
-      const { error: uerr } = await supabase
-        .from('products')
-        .update({
-          price: newPrice,
-          price_wholesale: newCost,
-          volume_options: newVols,
-          stock: numOrZero(p.stock),
-        })
-        .eq('id', p.id);
-      if (uerr) {
-        console.error(`   ERROR id=${p.id} ${p.name}: ${uerr.message}`);
-        continue;
+      if (!DRY_RUN) {
+        const { error: uerr } = await supabase
+          .from('products')
+          .update({
+            price: newPrice,
+            price_wholesale: newCost,
+            volume_options: newVols,
+            stock: numOrZero(p.stock),
+          })
+          .eq('id', p.id);
+        if (uerr) {
+          console.error(`   ERROR id=${p.id} ${p.name}: ${uerr.message}`);
+          continue;
+        }
       }
       const dir = newCost > oldCost ? 'SUBIO' : (newCost < oldCost ? 'BAJO' : '=');
       updated.push({ id: p.id, name: p.name, dir, oldCost, newCost, oldPrice, newPrice });
@@ -135,6 +141,7 @@ async function main() {
 
   console.log('\n===================== APLICADO =====================');
   console.log(`Actualizados en DB: ${updated.length} | Ya consistentes: ${unchanged.length}`);
+  if (DRY_RUN) console.log('(DRY-RUN: los cambios de arriba son los que se aplicarían)');
   for (const x of updated) {
     console.log(`  [${x.dir}] id=${x.id} | ${x.name.trim().slice(0, 35)} | costo ${x.oldCost} -> ${x.newCost} | venta ${x.oldPrice} -> ${x.newPrice}`);
   }

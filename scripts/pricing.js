@@ -5,6 +5,18 @@
 const MIN_MARKUP = 50000;
 const MAX_MARKUP = 100000;
 
+// El proveedor publica price_wholesale en USD (valores pequeños). Si el valor es
+// pequeño (<= USD_THRESHOLD) se asume USD y se convierte a Gs. Si ya es un valor
+// grande, viene en guaraníes y se usa tal cual (auto-detección robusta).
+const USD_RATE = 6100;
+const USD_THRESHOLD = 500;
+
+function convertWholesale(v) {
+  const n = numOrZero(v);
+  if (n <= 0) return 0;
+  return n <= USD_THRESHOLD ? Math.round(n * USD_RATE) : Math.round(n);
+}
+
 // Igual que src/lib/data.ts:calculateSalePrice
 function calculateSalePrice(wholesale) {
   if (wholesale <= 0) return 0;
@@ -60,13 +72,17 @@ function recalcVolumeOptions(product, fallbackWholesale) {
 }
 
 // Costo de venta unitario (lo que el proveedor cobra): price_wholesale ?? price.
+// Convierte USD a Gs cuando corresponde.
 function getProviderCost(p) {
-  return numOrZero(p.price_wholesale ?? p.price);
+  return convertWholesale(p.price_wholesale ?? p.price);
 }
 
 module.exports = {
   MIN_MARKUP,
   MAX_MARKUP,
+  USD_RATE,
+  USD_THRESHOLD,
+  convertWholesale,
   calculateSalePrice,
   getBaseWholesale,
   getDisplayPrice,
