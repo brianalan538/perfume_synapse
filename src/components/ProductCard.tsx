@@ -9,6 +9,12 @@ import { useCart } from '@/store/cart';
 
 const PHONE = '595985798538';
 
+const GENDER_BY_CATEGORY: Record<number, string> = {
+  1: 'MASCULINO',
+  2: 'FEMENINO',
+  3: 'UNISEX',
+};
+
 interface Props {
   product: Product;
 }
@@ -27,6 +33,9 @@ export default function ProductCard({ product }: Props) {
     : (product.price_wholesale > 0 ? product.price_wholesale : product.price);
   const price = calculateSalePrice(wholesale);
   const isConsult = price <= 0;
+  const genderLabel =
+    GENDER_BY_CATEGORY[product.category_id] ||
+    (product.category_name ? product.category_name.toUpperCase() : '');
 
   const consultMessage = encodeURIComponent(
     `¡Hola! Quiero consultar por el precio de:\n\n${product.name}${product.brand ? ` - ${product.brand}` : ''}\n\n¿Está disponible?`
@@ -70,6 +79,11 @@ export default function ProductCard({ product }: Props) {
         </div>
         <div className="p-4">
           <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">{product.name}</h3>
+          {genderLabel && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#7c3aed]/10 text-[#7c3aed] text-[10px] font-semibold uppercase tracking-wide mb-2">
+              {genderLabel}
+            </span>
+          )}
           <div>
             {isConsult ? (
               <a
