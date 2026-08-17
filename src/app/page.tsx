@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
+import DecantsSection from '@/components/DecantsSection';
 import { getProducts, getCategories } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
@@ -58,6 +59,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <DecantsSection />
     </div>
   );
 }

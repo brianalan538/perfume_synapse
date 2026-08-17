@@ -34,6 +34,7 @@ export default function Header() {
           <nav className="hidden lg:flex items-center space-x-6">
             <Link href="/" className="text-sm font-medium text-gray-300 hover:text-white">Inicio</Link>
             <Link href="/sobre-mi" className="text-sm font-medium text-gray-300 hover:text-white">Sobre Mi</Link>
+            <Link href="/decants" className="text-sm font-medium text-gray-300 hover:text-white">Decants</Link>
             <div className="relative group">
               <button className="text-sm font-medium text-gray-300 hover:text-white">Categorías</button>
               <div className="absolute top-full left-0 mt-2 w-48 bg-[#1a1a2e] border border-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
@@ -83,6 +84,7 @@ export default function Header() {
           <div className="px-4 py-3 space-y-2">
             <Link href="/" className="block py-2 text-sm font-medium text-gray-300 hover:text-white" onClick={() => setMenuOpen(false)}>Inicio</Link>
             <Link href="/sobre-mi" className="block py-2 text-sm font-medium text-gray-300 hover:text-white" onClick={() => setMenuOpen(false)}>Sobre Mi</Link>
+            <Link href="/decants" className="block py-2 text-sm font-medium text-gray-300 hover:text-white" onClick={() => setMenuOpen(false)}>Decants</Link>
             <div className="py-2">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Categorías</p>
               {categories.map(cat => (
