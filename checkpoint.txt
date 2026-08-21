@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-08-10
+Última actualización: 2026-08-21
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-Tablas: categories (18 filas), products (222 activas, 220 con imagen http)
+Tablas: categories (18 filas), products (230 total, 194 activas, 36 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -103,6 +103,8 @@ Archivos JSON originales (data scrapeada):
 [✓] Datos desde Supabase en vivo (catálogo y carrito desde el cliente;
     home, /category y /product desde el servidor)
 [✓] Imágenes desde Supabase Storage (URLs completas)
+[✓] Etiqueta de género en las cards (MASCULINO/FEMENINO/UNISEX según
+    category_id 1/2/3) para quien no usa categorías (2026-08-12)
 
 ======================  LÓGICA DE NEGOCIO =======================
 
@@ -130,6 +132,102 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
   MIDNIGHT, ANA ABIYEDH, ARMAF MEGA, KHAMRAH QAHWA, KHAMRAH DUKHAN, ASAD BLACK).
   1 sin costo en proveedor sin tocar (BOTOX WHITE SALON GOLD) y 16 sin match
   sin tocar.
+- Sync 2026-08-12: proveedor actualizó 2 precios (SUBIDAS). Aplicado con
+  sync-all-prices.js y verificado con compare-prices (0 cambios pendientes):
+    - TAG ROSSO UOMO (id 131): costo 140.300 -> 167.750, venta 215.000 -> 245.000
+    - HAWAS KOBRA (id 251):  costo 201.300 -> 207.400, venta 285.000 -> 290.000
+- Audit 2026-08-13: proveedor NO cambió precios (0 nuevos, 0 cambios de costo).
+  PERO ELIMINÓ 20 productos de su catálogo (ya no existen en su API ni en su web,
+  ni siquiera en otra categoría). Se verificó contra el bundle JS de su SPA:
+  su web consume exactamente el mismo /public/products.
+- 2026-08-13: se OCULTARON (is_active=false) los 20 retirados en Supabase:
+    - 15 recién ocultados: 25 CLUB DE NUIT INTENSE WOMAN, 28 CLUB DE NUIT
+      PRECIEUX, 58 LATTAFA RAVE NOW, 147 SPECTRE GOHTST, 163 GLACIER GOLD,
+      171 ETERNITY FOR WOMEN TESTER, 210 NEBRAS, 224 JEAN LOWE IMMORTEL,
+      235 SALVO EDP, 236 SALVO ELIXIR, 242 TIRAMISU S'MORES, 246 ROME
+      EXTRADOCE, 270 SET ASAD COLLECTION, 272 SET THE KINGDOM, 335 ANA
+      ABIYEDH PASSION.
+    - 5 ya estaban ocultos: 22 CLUB DE NUIT ICONIC, 125 ODYSSEY HOMME WHITE,
+      274 9PM REBEL - AFNAN, 228 LEONIE EDP, 317 RAYHAAN OBSIDIAN.
+  Resultado: 226 total, 206 activas, 20 ocultas. No hay tabla de pedidos en
+  Supabase (solo categories/products) -> ocultar no afecta pedidos históricos.
+- Audit 2026-08-14: proveedor SIN cambios (0 productos nuevos, 0 eliminados
+  además de los 20 ya ocultos, 0 cambios de precio). Verificado con
+  compare-prices.js (0 nuevos, 0 cambios de costo, 20 sin match = los ya
+  ocultos) y sync-all-prices.js --dry-run (todos los costos/ventas coinciden;
+  solo difiere el orden de claves de volume_options, sin impacto). Único cambio
+  real: stock de 3 productos (id 99 9PM NIGHT OUT 12->11, id 250 HAWAS ICE
+  1->12, id 103 MAYAR CHERRY 12->0) — no se muestra en el frontend público,
+  solo en /admin. No requiere deploy.
+- Audit 2026-08-17: proveedor actualizó 7 costos (4 SUBIDAS + 3 BAJADAS).
+  Aplicado con sync-all-prices.js y verificado con compare-prices.js
+  (0 cambios de costo pendientes). Cambios en precio de venta visible (5):
+    - SABAH AL WARD (id 135):        costo 100.650 -> 106.750, venta 165.000 -> 175.000
+    - AMEERAT AL ARAB ASDAAF (id 148): costo 100.650 -> 109.800, venta 165.000 -> 180.000
+    - SABAH AL WARD VALENTINE (id 138): costo 140.300 -> 131.150, venta 215.000 -> 205.000
+    - QAED AL FURSAN (id 187):       costo 100.650 -> 106.750, venta 165.000 -> 175.000
+    - LATTAFA KHAMRAH QAHWA (id 57): costo 122.000 -> 128.100, venta 190.000 -> 200.000
+  Solo costo (venta sin cambio): SABAH AL WARD DELILAH (139) 134.200->131.150,
+  DURRAT AL AROOS LOVE (277) 134.200->131.150. Resto: 0 nuevos, 0 eliminados
+  además de los 20 ya ocultos. Sin cambios de código -> sin deploy (precios
+  salen en vivo desde Supabase).
+- Audit 2026-08-18: proveedor SIN cambios reales (0 nuevos, 0 eliminados además
+  de los 20 ya ocultos, 0 cambios de costo, 0 cambios de stock/volúmenes).
+  Verificado con compare-prices.js (0 nuevos, 0 cambios de costo, 20 sin match =
+  los ya ocultos, 1 en consulta = BOTOX WHITE SALON GOLD) y sync-all-prices.js
+  --dry-run: marca 205 con [=] porque difiere SOLO el orden de claves de
+  volume_options (confirmado: comparando volumenes normalizados/sorteados hay
+  0 diferencias reales). Sin cambios de código ni precios -> sin deploy.
+- Audit 2026-08-18 (re-verificación 22:40): resultados IDÉNTICOS a la auditoría
+  del mismo día. compare-prices.js: 0 nuevos, 0 cambios de costo, 20 sin match
+  (los ya ocultos), 1 en consulta (BOTOX WHITE SALON GOLD). sync-all-prices.js
+  --dry-run: 205 con [=] por orden de claves de volume_options (0 reales).
+  Sin nada que aplicar -> sin deploy.
+- Audit 2026-08-19: proveedor con 1 producto NUEVO y 15 ELIMINADOS adicionales.
+  Aplicado:
+    - NUEVO RAYHAAN ACUATICA (id 346, RAYHAAN, cat 1): insertado en Supabase
+      siguiendo add-new-provider.mjs. Sin price_wholesale en proveedor (usa solo
+      price 195.000) -> queda en modo CONSULTAR (venta 0, se muestra "Consultar"
+      en el frontend hasta que publique costo). Imagen subida a Storage.
+    - 15 ELIMINADOS del proveedor (verificados: no existen ni en otra categoría)
+      ocultados con is_active=false (soft delete):
+      id 20 ARMAF CLUB DE NUIT WOMAN, 60 LATTAFA ECLAIRE EDP, 61 HAYA EDP,
+      99 9PM NIGHT OUT AFNAN, 127 ODYSSEY GO MANGO, 139 SABAH AL WARD DELILAH,
+      144 BHARARA CHAMPAGNE BLUE, 146 VULCAN FEU, 148 AMEERAT AL ARAB ASDAAF,
+      166 LATTAFA FAKHAR ROSE, 213 PETRA EDP, 215 LA VIVACITE EDP,
+      218 ROSE SEDUCTION VIP FEMME, 238 FATIMA VELVET, 257 GHALA EDP.
+  Resultado: 227 total, 192 activas, 35 ocultas. 0 cambios de costo/stock en los
+  que siguen. compare-prices.js verificado post-cambio: 0 nuevos, 0 cambios de
+  costo, 35 sin match (todos ya ocultos), 2 en consulta (BOTOX WHITE SALON GOLD,
+  RAYHAAN ACUATICA). No hay cambios de código -> sin deploy (datos viven en
+  Supabase).
+- Audit 2026-08-21: proveedor con 3 productos NUEVOS, RAYHAAN ACUATICA (346)
+  publicó su costo, y ELIMINÓ a HAWAS VERDE. Aplicado:
+    - NUEVOS insertados siguiendo add-new-provider.mjs (todos cat 1, Masculinos,
+      stock 20, imagen subida a Storage):
+      id 347 HAWAS CHROME - RASASI: costo USD 44 -> Gs 268.400, venta 365.000
+      id 348 RAYHAAN LION:          costo USD 24 -> Gs 146.400, venta 220.000
+      id 349 RAYHAAN VALHALLA:      costo USD 24 -> Gs 146.400, venta 220.000
+    - FIX en add-new-provider.mjs: convertía mal los costos USD (llamaba
+      calculateSalePrice sobre el valor crudo sin convertWholesale -> quedaban con
+      venta 50.000) y no resolvía URLs de imagen relativas del proveedor
+      (/public/img/N). Ahora convierte USD->Gs y sube la imagen a Storage.
+      Commit del fix pusheado a main.
+    - RAYHAAN ACUATICA (346): el proveedor publicó price_wholesale 176.900 ->
+      sync-all-prices.js lo sacó de CONSULTAR: venta 0 -> 255.000.
+    - HAWAS VERDE (253) eliminado del proveedor (verificado: no existe en ninguna
+      categoría) -> ocultado con is_active=false (soft delete).
+  Resultado: 230 total, 194 activas, 36 ocultas. compare-prices.js verificado
+  post-cambios: 0 nuevos, 0 cambios de costo pendientes, 36 sin match (todos ya
+  ocultos), 1 en consulta (BOTOX WHITE SALON GOLD, preexistente). Resto de
+  productos: 0 cambios reales (los [=] del dry-run siguen siendo solo orden de
+  claves de volume_options). Deploy solo por el fix del script (sin impacto
+  visual: los precios salen en vivo desde Supabase).
+- Nota 2026-08-13: el proveedor expone price_wholesale en USD y su ticker de
+  cotizaciones confirma USD_RATE = 6100 (coincide con pricing.js). Su web tiene
+  cuenta de clientes + checkout MercadoPago + pedidos (/public/orders) + multi-
+  imagen (image_urls) + destacados curados. NO se replican por ahora (MercadoPago
+  no opera en Paraguay; el checkout sigue siendo por WhatsApp).
 - Modo --dry-run disponible en sync-all-prices.js para previsualizar sin escribir.
 - Corrección: ANGHAM SECOND SONG (id 183) tenía volume[].price_wholesale = null
   en el proveedor; el script ahora usa el wholesale del producto (140.000) en
@@ -152,8 +250,11 @@ IMÁGENES:
 
 ======================  ESTADO GIT / DEPLOY =======================
 
-Ramas: main (default). Único commit inicial:
-  948981c "E-commerce perfumes SYNAPSE DIGITAL: ..."
+Ramas: main (default).
+Commits:
+  948981c "E-commerce perfumes SYNAPSE DIGITAL: ..." (inicial)
+  76aa29c "feat: mostrar etiqueta de género (MASCULINO/FEMENINO/UNISEX)
+          en las cards de producto" (2026-08-12, pusheado a main)
 
 COMMITEO de cambios (gitignore ya cubre):
   node_modules/, .next/, .env*, downloaded_images/, public/images/
@@ -205,6 +306,10 @@ FIX EN VERCEL (Project Settings > Environment Variables):
 [ ] Confirmar deploy OK en Vercel (home debe mostrar productos)
 [ ] Revisar /admin en producción (login + crear/editar/ocultar un producto)
 [ ] BORRAR src/app/api/diag/route.ts cuando termine el diagnóstico
+[ ] Si el proveedor repone alguno de los 20 retirados: restaurar desde /admin
+     y volver a correr scripts/sync-all-prices.js
+[ ] Opcional: ticker de cotizaciones en el home (el proveedor usa USD 6100)
+[ ] Opcional: multi-imagen por producto (image_urls)
 [ ] Opcional: dominio propio
 [ ] Opcional: Google Analytics o similar
 [ ] Opcional: SEO (metadatos, sitemap, robots.txt)
