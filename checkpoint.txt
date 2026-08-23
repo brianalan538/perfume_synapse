@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-08-21
+Última actualización: 2026-08-23
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-Tablas: categories (18 filas), products (230 total, 194 activas, 36 ocultas)
+Tablas: categories (18 filas), products (238 total, 204 activas, 34 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -201,6 +201,54 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
   costo, 35 sin match (todos ya ocultos), 2 en consulta (BOTOX WHITE SALON GOLD,
   RAYHAAN ACUATICA). No hay cambios de código -> sin deploy (datos viven en
   Supabase).
+- Audit 2026-08-23: proveedor con 8 productos NUEVOS, 7 BAJADAS de costo,
+  4 REPUESTOS (volvieron al catálogo) y 2 ELIMINADOS nuevos. Aplicado:
+    - 7 BAJADAS aplicadas con sync-all-prices.js (verificado 0 pendientes):
+      - LATTAFA FAKHAR MEN EDP (55):        costo 140.300 -> 137.250, venta 215.000 -> 210.000
+      - ODYSSEY MANDARIN SKY ELIXIR (121):  costo 207.400 -> 189.100, venta 290.000 -> 270.000
+      - ODYSSEY MANDARIN SKY VINTAGE (129): costo 192.150 -> 189.100, venta 275.000 -> 270.000
+      - LATTAFA KHAMRAH WAHA (141):         costo 286.700 -> 256.200, venta 385.000 -> 350.000
+      - AMBER OUD GOLD EDITION (42):        costo 286.700 -> 274.500, venta 385.000 -> 370.000
+      - RAYHAAN WOLF (261):                 costo 195.200 -> 176.900, venta 280.000 -> 255.000
+      - BHARARA KING EDP (70):              costo 326.350 -> 298.900, venta 425.000 -> 400.000
+    - NUEVOS insertados con add-new-provider.mjs (TARGET_IDS actualizado a los 8):
+      id 350 RAYHAAN PACIFIC AURA (cat 1): sin costo -> CONSULTAR
+      id 351 RAYHAAN CORIUM (cat 1):       sin costo -> CONSULTAR
+      id 352 CALIFORNIA BLUE - MYKONOS (352, cat 1): sin price_wholesale -> CONSULTAR
+      id 353 CONQUER - MYKONOS (cat 1):            sin price_wholesale -> CONSULTAR
+      id 354 INVADE - MYKONOS (cat 1):             sin price_wholesale -> CONSULTAR
+      id 355 SHAGAF AL WARD (cat 2):               sin price_wholesale -> CONSULTAR
+      id 282 SUPREMACY PURPLE - AFNAN (cat 2): costo USD 26 -> Gs 158.600, venta 235.000
+      id 130 DUNESCAPE ARMAF (cat 1):              sin price_wholesale -> CONSULTAR
+      OJO: compare-prices.js lista el "costo" de los nuevos con fallback a p.price
+      minorista cuando no hay wholesale; add-new-provider.mjs exige
+      price_wholesale > 0 -> quedan en CONSULTAR (mismo patrón que RAYHAAN
+      ACUATICA en su alta). Imágenes subidas a Storage.
+    - 4 REPUESTOS por el proveedor, restaurados con is_active=true (costos ya
+      coincidían, sync los dejó iguales):
+      id 163 GLACIER GOLD (venta 110.000), id 139 SABAH AL WARD DELILAH
+      (205.000), id 146 VULCAN FEU (320.000), id 272 SET THE KINGDOM (265.000).
+      Nota: GLACIER GOLD sigue sin price_wholesale en proveedor (usa su viejo
+      costo 50.000 guardado).
+    - 2 ELIMINADOS del proveedor (verificados: no existen en la API) ocultados
+      con is_active=false (soft delete):
+      id 219 DARK DOOR SPORT, id 276 MUSAMAN BLACK.
+    - Descripciones 2026-08-23: short_description + description (patrón 346)
+      agregadas a los 8 nuevos. Notas verificadas contra Fragrantica/web oficial
+      (Corium: castaña/salvia/vainilla-cuero-oud; Pacific Aura: cítricos/menta/
+      higo-ambroxan; Mykonos California Blue: lavanda-pera-sal/caramelo-maderas;
+      Conquer: bergamota-jengibre/orris-azahar/ámbar-vainilla; Invade: pimienta
+      rosa-lavanda-enebro/cashmeran-canela-caramelo/ámbar-vainilla [notas oficiales
+      de marca, las de Fragrantica difieren]; Shagaf Al Ward: rosa de mayo-
+      jazmín/tuberosa-narciso/ámbar-cedro; Supremacy Purple: naranja-durazno/
+      ámbar dulce-almizcle/vaina-pera [oficiales Afnan]; Dunescape: cítricos-
+      jengibre/manzana-cashmeran/musk-sándalo-ámbar). Viven en Supabase.
+  Resultado: 238 total, 204 activas, 34 ocultas. compare-prices.js verificado
+  post-cambios: 0 nuevos, 0 cambios de costo pendientes, 34 sin match (todos ya
+  ocultos), 8 en consulta (BOTOX WHITE SALON GOLD preexistente + los 7 nuevos sin
+  costo del proveedor). Commit solo del update de TARGET_IDS en
+  add-new-provider.mjs (sin impacto visual: los precios salen en vivo desde
+  Supabase).
 - Audit 2026-08-21: proveedor con 3 productos NUEVOS, RAYHAAN ACUATICA (346)
   publicó su costo, y ELIMINÓ a HAWAS VERDE. Aplicado:
     - NUEVOS insertados siguiendo add-new-provider.mjs (todos cat 1, Masculinos,
@@ -223,6 +271,11 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
   productos: 0 cambios reales (los [=] del dry-run siguen siendo solo orden de
   claves de volume_options). Deploy solo por el fix del script (sin impacto
   visual: los precios salen en vivo desde Supabase).
+- Descripciones 2026-08-21: agregadas short_description + description (HTML,
+  formato del patrón 346: pirámide olfativa + ficha técnica) a los 3 nuevos:
+  HAWAS CHROME (Frutal Ámbar), RAYHAAN LION (Aromática Especiada) y RAYHAAN
+  VALHALLA (Frutal Gourmand). Notas verificadas contra Fragrantica/web oficial.
+  Viven en Supabase (no van al repo ni requieren commit/deploy).
 - Nota 2026-08-13: el proveedor expone price_wholesale en USD y su ticker de
   cotizaciones confirma USD_RATE = 6100 (coincide con pricing.js). Su web tiene
   cuenta de clientes + checkout MercadoPago + pedidos (/public/orders) + multi-
