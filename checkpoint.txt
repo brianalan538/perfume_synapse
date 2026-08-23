@@ -201,6 +201,19 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
   costo, 35 sin match (todos ya ocultos), 2 en consulta (BOTOX WHITE SALON GOLD,
   RAYHAAN ACUATICA). No hay cambios de código -> sin deploy (datos viven en
   Supabase).
+- Fix SEO/seguridad 2026-08-23 (commit posterior al audit):
+    - FUGA corregida: getProductById() ahora filtra is_active=true -> los
+      ocultos ya NO se ven por URL directa (/product/219 daba 200 con todo el
+      producto; ahora notFound).
+    - /product/[id] migrado a SSR: page.tsx es server component con
+      generateMetadata (title/desc/OG/Twitter/canonical únicos por producto)
+      + content.tsx cliente nuevo (misma UI, recibe product por props). Ahora
+      cada perfume tiene su HTML completo para Google. Además el detalle ahora
+      también renderiza short_description (antes no se mostraba en ningún lado).
+    - Agregados src/app/robots.ts (allow all, disallow /admin y /api) y
+      src/app/sitemap.ts (force-dynamic: home, /products, 3 categorías y todos
+      los activos; se regenera en vivo, los ocultos salen solos).
+    - Verificado: npm run lint (0 errores) y npm run build OK.
 - Audit 2026-08-23: proveedor con 8 productos NUEVOS, 7 BAJADAS de costo,
   4 REPUESTOS (volvieron al catálogo) y 2 ELIMINADOS nuevos. Aplicado:
     - 7 BAJADAS aplicadas con sync-all-prices.js (verificado 0 pendientes):

@@ -60,6 +60,7 @@ export async function getProductById(id: number): Promise<Product | null> {
     .from('products')
     .select('*')
     .eq('id', id)
+    .eq('is_active', true)
     .single();
 
   if (error || !data) return null;
