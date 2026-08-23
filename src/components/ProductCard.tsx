@@ -55,6 +55,7 @@ export default function ProductCard({ product }: Props) {
       selected_volume: volumeOption,
       selected_flavor: null,
     });
+    track('add_to_cart', { source: 'card', product_id: product.id, name: product.name, price });
     setAddedId(product.id);
     setTimeout(() => setAddedId(null), 1500);
   }
