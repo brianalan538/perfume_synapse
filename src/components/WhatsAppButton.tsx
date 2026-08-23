@@ -2,6 +2,7 @@
 
 import { MessageCircle } from 'lucide-react';
 import { useCart } from '@/store/cart';
+import { track } from '@vercel/analytics';
 
 const PHONE = '595985798538';
 
@@ -33,6 +34,7 @@ export default function WhatsAppButton() {
       href={`https://wa.me/${PHONE}?text=${generateMessage()}`}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => track('whatsapp_click', { source: 'boton_flotante', items: items.length, total })}
       className="fixed bottom-6 right-6 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition-colors z-40 flex items-center gap-2"
     >
       <MessageCircle size={24} />

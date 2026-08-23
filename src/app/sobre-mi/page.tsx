@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ShieldCheck, BadgeCheck, HandCoins, HeartHandshake, Truck, Sparkles } from "lucide-react";
+import TrackedWhatsAppLink from "@/components/TrackedWhatsAppLink";
 
 export const metadata: Metadata = {
   title: "Sobre Mi — SYNAPSE DIGITAL",
@@ -94,14 +95,13 @@ export default function AboutPage() {
           Escribime por WhatsApp y te respondo a la brevedad. Estoy para ayudarte a
           encontrar la fragancia perfecta para vos o para regalar.
         </p>
-        <a
+        <TrackedWhatsAppLink
           href="https://wa.me/595985798538"
-          target="_blank"
-          rel="noopener noreferrer"
+          source="sobre_mi"
           className="inline-block bg-[#7c3aed] text-white px-8 py-3 rounded-full font-medium hover:bg-[#6d28d9] transition-colors"
         >
           Escribime por WhatsApp
-        </a>
+        </TrackedWhatsAppLink>
       </div>
     </div>
   );

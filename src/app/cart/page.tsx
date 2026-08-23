@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Trash2, Minus, Plus, ShoppingBag, MessageCircle } from 'lucide-react';
 import { useCart } from '@/store/cart';
+import { track } from '@vercel/analytics';
 
 const PHONE = '595985798538';
 
@@ -104,6 +105,7 @@ export default function CartPage() {
           href={`https://wa.me/${PHONE}?text=${whatsappMessage()}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track('whatsapp_click', { source: 'carrito', items: items.length, total: totalPrice() })}
           className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
         >
           <MessageCircle size={20} />

@@ -6,6 +6,7 @@ import { ShoppingCart, Check, MessageCircle } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { calculateSalePrice } from '@/lib/data';
 import { useCart } from '@/store/cart';
+import { track } from '@vercel/analytics';
 
 const PHONE = '595985798538';
 
@@ -90,7 +91,10 @@ export default function ProductCard({ product }: Props) {
                 href={`https://wa.me/${PHONE}?text=${consultMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
+                onClick={e => {
+                  e.stopPropagation();
+                  track('whatsapp_click', { source: 'card_consultar', product_id: product.id, name: product.name });
+                }}
                 className="inline-flex items-center gap-1 text-lg font-bold text-[#7c3aed] hover:underline"
               >
                 Consultar
@@ -106,7 +110,10 @@ export default function ProductCard({ product }: Props) {
           href={`https://wa.me/${PHONE}?text=${consultMessage}`}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={e => e.stopPropagation()}
+          onClick={e => {
+            e.stopPropagation();
+            track('whatsapp_click', { source: 'card_icono', product_id: product.id, name: product.name });
+          }}
           className="absolute top-2 right-2 w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center hover:bg-green-700 transition-colors shadow-md"
           title="Consultar por WhatsApp"
         >

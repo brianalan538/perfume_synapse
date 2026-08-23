@@ -5,6 +5,7 @@ import { ShoppingCart, ChevronLeft, Check, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { calculateSalePrice } from '@/lib/data';
 import { useCart } from '@/store/cart';
+import { track } from '@vercel/analytics';
 import type { Product, VolumeOption } from '@/lib/types';
 
 const PHONE = '595985798538';
@@ -36,8 +37,24 @@ export default function ProductDetail({ product }: { product: Product }) {
       selected_volume: selectedVolume,
       selected_flavor: null,
     });
+    track('add_to_cart', {
+      source: 'detalle',
+      product_id: product.id,
+      name: product.name,
+      price: isConsult ? null : currentPrice,
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  }
+
+  function trackWhatsApp() {
+    track('whatsapp_click', {
+      source: 'detalle',
+      product_id: product.id,
+      name: product.name,
+      volume_ml: selectedVolume?.ml ?? null,
+      price: isConsult ? null : currentPrice,
+    });
   }
 
   function whatsappMessage() {
@@ -117,6 +134,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 href={`https://wa.me/${PHONE}?text=${whatsappMessage()}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={trackWhatsApp}
                 className="flex-1 bg-[#7c3aed] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#6d28d9] transition-colors flex items-center justify-center gap-2"
               >
                 <MessageCircle size={20} />
@@ -127,7 +145,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 <button onClick={handleAddToCart} className="flex-1 bg-[#7c3aed] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#6d28d9] transition-colors flex items-center justify-center gap-2">
                   {added ? <><Check size={20} /> Agregado</> : <><ShoppingCart size={20} /> Agregar al Carrito</>}
                 </button>
-                <a href={`https://wa.me/${PHONE}?text=${whatsappMessage()}`} target="_blank" rel="noopener noreferrer" className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2">
+                <a href={`https://wa.me/${PHONE}?text=${whatsappMessage()}`} target="_blank" rel="noopener noreferrer" onClick={trackWhatsApp} className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2">
                   <MessageCircle size={20} />
                   <span className="hidden md:inline">WhatsApp</span>
                 </a>

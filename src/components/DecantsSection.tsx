@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FlaskConical, CheckCircle2, Sparkles, Car, Wallet, Gift } from 'lucide-react';
+import TrackedWhatsAppLink from './TrackedWhatsAppLink';
 
 const PHONE = '595985798538';
 
@@ -66,15 +67,14 @@ export default function DecantsSection() {
               </div>
             </div>
 
-            <a
+            <TrackedWhatsAppLink
               href={`https://wa.me/${PHONE}?text=${encodeURIComponent('¡Hola! Quiero pedir decants de perfume 🧪')}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              source="decants_home"
               className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-3 rounded-full font-medium hover:bg-green-700 transition-colors"
             >
               <Gift size={20} />
               Pedir mis decants por WhatsApp
-            </a>
+            </TrackedWhatsAppLink>
           </div>
         </div>
 

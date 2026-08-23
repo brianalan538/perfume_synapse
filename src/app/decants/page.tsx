@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import TrackedWhatsAppLink from "@/components/TrackedWhatsAppLink";
 import {
   FlaskConical,
   Sparkles,
@@ -123,15 +124,14 @@ export default function DecantsPage() {
             </Link>{" "}
             con total confianza.
           </p>
-          <a
-            href={waLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-3 rounded-full font-medium hover:bg-green-700 transition-colors"
-          >
-            <Gift size={20} />
-            Pedir mis decants por WhatsApp
-          </a>
+        <TrackedWhatsAppLink
+          href={waLink}
+          source="decants_hero"
+          className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-3 rounded-full font-medium hover:bg-green-700 transition-colors"
+        >
+          <Gift size={20} />
+          Pedir mis decants por WhatsApp
+        </TrackedWhatsAppLink>
         </div>
       </div>
 
@@ -165,15 +165,14 @@ export default function DecantsPage() {
           Decime cuál y qué tamaño preferís (5 ml o 10 ml). Coordinamos envío o retiro por WhatsApp,
           con la misma garantía de siempre.
         </p>
-        <a
+        <TrackedWhatsAppLink
           href={waLink}
-          target="_blank"
-          rel="noopener noreferrer"
+          source="decants_footer"
           className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-3 rounded-full font-medium hover:bg-green-700 transition-colors"
         >
           <HeartHandshake size={20} />
           Consultar por WhatsApp
-        </a>
+        </TrackedWhatsAppLink>
       </div>
     </div>
   );
