@@ -201,6 +201,26 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
   costo, 35 sin match (todos ya ocultos), 2 en consulta (BOTOX WHITE SALON GOLD,
   RAYHAAN ACUATICA). No hay cambios de código -> sin deploy (datos viven en
   Supabase).
+- Tracking Vercel Analytics 2026-08-23 (commits 54fc940 + 2ca2798):
+    - Eventos custom implementados con track() de @vercel/analytics v2.0.1:
+      * whatsapp_click con source: detalle (producto+precio+volumen),
+        card_consultar, card_icono, boton_flotante (items+total), carrito
+        (items+total), decants_hero, decants_footer, decants_home, sobre_mi.
+      * add_to_cart con source: detalle y card (quick-add).
+    - Nuevo componente src/components/TrackedWhatsAppLink.tsx (client wrapper)
+      para usar track desde server components (decants/sobre-mi/DecantsSection).
+    - Los clicks a WhatsApp NO eran medibles antes (no son pageviews). Ahora se
+      ven en Vercel -> Analytics -> Custom Events tras el deploy.
+    - API de Web Analytics actualizada (para futuras lecturas con token):
+      GET https://api.vercel.com/v1/query/web-analytics/visits/count y
+      .../visits/aggregate?projectId=...&since=YYYY-MM-DD&until=YYYY-MM-DD
+      [&by=country|requestPath|deviceType|browserName|referrerHostname|day]
+      [&limit<=100] [&filter="requestPath eq '/...'"]. El endpoint viejo
+      /v1/web-analytics/data ya no existe (404). Token del user: temporal,
+      expira; pedir uno nuevo en vercel.com/settings/tokens cuando se necesite.
+    - Snapshot tráfico 30d (24-jul a 23-ago): 199 visitantes, 633 pv, 88% PY,
+      90% mobile, 87% directo, FB/IG in-app ~15%, carrito 5,5%, solo 51/204
+      productos vistos, pico 31-jul y 3-ago, cero tráfico el 20-ago (verificar).
 - Fix SEO/seguridad 2026-08-23 (commit posterior al audit):
     - FUGA corregida: getProductById() ahora filtra is_active=true -> los
       ocultos ya NO se ven por URL directa (/product/219 daba 200 con todo el
@@ -368,6 +388,12 @@ FIX EN VERCEL (Project Settings > Environment Variables):
 
 ======================  PENDIENTE =======================
 
+[ ] Revisar Custom Events (whatsapp_click / add_to_cart) en ~2 semanas y
+     analizar conversión real
+[ ] Dar de alta el sitemap en Google Search Console
+[ ] Opcional: sección "Bajaron de precio" / "Nuevos" en home (los usuarios ven
+     el catálogo pero solo abren 51/204 productos)
+[ ] Verificar qué pasó el 2026-08-20 (cero tráfico registrado)
 [ ] Aplicar fix de env vars en Vercel (ver INCIDENTE arriba) + redeploy
 [ ] Confirmar deploy OK en Vercel (home debe mostrar productos)
 [ ] Revisar /admin en producción (login + crear/editar/ocultar un producto)
