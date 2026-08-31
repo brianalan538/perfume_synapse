@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-08-23
+Última actualización: 2026-08-31
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,13 +18,17 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-Tablas: categories (18 filas), products (238 total, 204 activas, 34 ocultas)
+Tablas: categories (18 filas), products (248 total, 209 activas, 39 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
    - Remote local: origin = https://github.com/brianalan538/perfume_synapse.git
 
-Vercel: deploy EN CURSO (importado desde GitHub, rama main, root ./)
+Vercel: deploy OK (importado desde GitHub, rama main, root ./)
+   - Project ID: prj_qL4VF8CCMjbCdTszGtaNyMy3JD6k
+   - Analytics API token: [GUARDADO EN .env.local - NO PUBLICAR]
+     (nombre "To_look", never expires, creado 2026-08-24)
+   - Custom events REQUIEREN plan Pro/Enterprise (no disponibles en plan actual)
    - Env vars a configurar en Vercel (Project Settings > Environment Variables):
        NEXT_PUBLIC_SUPABASE_URL
        NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -174,7 +178,7 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
 - Audit 2026-08-18: proveedor SIN cambios reales (0 nuevos, 0 eliminados además
   de los 20 ya ocultos, 0 cambios de costo, 0 cambios de stock/volúmenes).
   Verificado con compare-prices.js (0 nuevos, 0 cambios de costo, 20 sin match =
-  los ya ocultos, 1 en consulta = BOTOX WHITE SALON GOLD) y sync-all-prices.js
+  los ya ocultos, 1 en consulta = BOTOX WHITE SALON GOLD) and sync-all-prices.js
   --dry-run: marca 205 con [=] porque difiere SOLO el orden de claves de
   volume_options (confirmado: comparando volumenes normalizados/sorteados hay
   0 diferencias reales). Sin cambios de código ni precios -> sin deploy.
@@ -216,8 +220,9 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
       .../visits/aggregate?projectId=...&since=YYYY-MM-DD&until=YYYY-MM-DD
       [&by=country|requestPath|deviceType|browserName|referrerHostname|day]
       [&limit<=100] [&filter="requestPath eq '/...'"]. El endpoint viejo
-      /v1/web-analytics/data ya no existe (404). Token del user: temporal,
-      expira; pedir uno nuevo en vercel.com/settings/tokens cuando se necesite.
+      /v1/web-analytics/data ya no existe (404). Token vigente: "To_look"
+      (vcp_6gTyN..., never expires, creado 2026-08-24, 30 días según user).
+      Custom events requieren plan Pro/Enterprise.
     - Snapshot tráfico 30d (24-jul a 23-ago): 199 visitantes, 633 pv, 88% PY,
       90% mobile, 87% directo, FB/IG in-app ~15%, carrito 5,5%, solo 51/204
       productos vistos, pico 31-jul y 3-ago, cero tráfico el 20-ago (verificar).
@@ -230,7 +235,7 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
       + content.tsx cliente nuevo (misma UI, recibe product por props). Ahora
       cada perfume tiene su HTML completo para Google. Además el detalle ahora
       también renderiza short_description (antes no se mostraba en ningún lado).
-    - Agregados src/app/robots.ts (allow all, disallow /admin y /api) y
+      Agregados src/app/robots.ts (allow all, disallow /admin y /api) y
       src/app/sitemap.ts (force-dynamic: home, /products, 3 categorías y todos
       los activos; se regenera en vivo, los ocultos salen solos).
     - Verificado: npm run lint (0 errores) y npm run build OK.
@@ -279,7 +284,7 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
   Resultado: 238 total, 204 activas, 34 ocultas. compare-prices.js verificado
   post-cambios: 0 nuevos, 0 cambios de costo pendientes, 34 sin match (todos ya
   ocultos), 8 en consulta (BOTOX WHITE SALON GOLD preexistente + los 7 nuevos sin
-  costo del proveedor). Commit solo del update de TARGET_IDS en
+  costo del proveedor). Commit solo del update de TARGET_IDS in
   add-new-provider.mjs (sin impacto visual: los precios salen en vivo desde
   Supabase).
 - Audit 2026-08-21: proveedor con 3 productos NUEVOS, RAYHAAN ACUATICA (346)
@@ -296,7 +301,7 @@ ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
       Commit del fix pusheado a main.
     - RAYHAAN ACUATICA (346): el proveedor publicó price_wholesale 176.900 ->
       sync-all-prices.js lo sacó de CONSULTAR: venta 0 -> 255.000.
-    - HAWAS VERDE (253) eliminado del proveedor (verificado: no existe en ninguna
+    - HAWAS VERDE (253) deitado del proveedor (verificado: no existe en ninguna
       categoría) -> ocultado con is_active=false (soft delete).
   Resultado: 230 total, 194 activas, 36 ocultas. compare-prices.js verificado
   post-cambios: 0 nuevos, 0 cambios de costo pendientes, 36 sin match (todos ya
@@ -386,13 +391,101 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   5. Verificar con https://perfume-synapse.vercel.app/api/diag
      (debe mostrar anonLength 208 y sin error). LUEGO BORRAR /api/diag.
 
+- Audit 2026-08-24: proveedor SIN cambios reales (0 nuevos, 0 eliminados, 0
+  cambios de costo). sync-all-prices.js --dry-run confirmó 0 diferencias reales
+  (solo orden de claves de volume_options). PERO 6 productos que estaban en
+  CONSULTAR (sin costo) ahora publicaron price_wholesale y se aplicaron:
+    - id 350 RAYHAAN PACIFIC AURA:    costo USD 32 -> Gs 195.000, venta 280.000
+    - id 130 DUNESCAPE ARMAF:         costo USD 37 -> Gs 225.000, venta 315.000
+    - id 352 CALIFORNIA BLUE MYKONOS: costo USD 20 -> Gs 120.000, venta 190.000
+    - id 353 CONQUER MYKONOS:         costo USD 20 -> Gs 120.000, venta 190.000
+    - id 354 INVADE MYKONOS:          costo USD 20 -> Gs 120.000, venta 190.000
+    - id 355 SHAGAF AL WARD:          costo USD 19 -> Gs 115.000, venta 185.000
+  Resto CONSULTAR: id 351 RAYHAAN CORIUM y id 278 BOTOX WHITE SALON GOLD
+  (siguen sin costo en proveedor). Resultado: 238 total, 204 activas,
+  34 ocultas. Los 6 ahora tienen precio visible en el frontend (vive en
+  Supabase, sin deploy necesario).
+- Analytics 2026-08-24 (API Vercel con token "To_look"):
+  - Vercel Project ID: prj_qL4VF8CCMjbCdTszGtaNyMy3JD6k
+  - Semana 18-24 ago: 62 visitantes, 154 pv. 24-ago: 26v/60pv (mejor día,
+    publicación en redes sociales). 20-ago: 0v (caído, investigar).
+  - Referrers semana: directo 31v/88pv, Facebook 15v/16pv, Instagram 2v/2pv.
+  - Top productos semana: BHARARA KING (5v), ASAD BLACK (3v), RAYHAAN ACUATICA
+    (3v), HAWAS FOR HIM (2v). 9 productos distintos vistos de 204 activos.
+  - Carrito: 3 visitas semana (10% de los que vieron productos).
+  - Custom events (whatsapp_click/add_to_cart) REQUIEREN plan Pro/Enterprise.
+    No disponibles. Alternativa: Google Analytics (gratis).
+  - Facebook trae tráfico al catálogo pero no a productos específicos.
+    Instagram más preciso (llega a producto concreto).
+- Audit 2026-08-26: proveedor con 6 productos NUEVOS y 12 cambios de costo
+  (8 SUBIDAS + 4 BAJADAS). Aplicado:
+    - 6 NUEVOS insertados con add-new-provider.mjs (todos con price_wholesale
+      null en proveedor → el sync usó price minorista como costo → precios
+      visibles en frontend, pero sin margen real de wholesale):
+      id 356 JOURI LATTAFA (cat 2): costo 170.000, venta 250.000
+      id 357 HAWAS DIVA (cat 2): costo 250.000, venta 340.000
+      id 358 DONNA INTENSE (cat 2): costo 145.000, venta 220.000
+      id 359 FAHAD (cat 1): costo 220.000, venta 305.000
+      id 360 THE PRIDE ADMIRAL (cat 1): costo 175.000, venta 255.000
+      id 361 Bade'e Al Oud BLACK EXPOSED (cat 1): costo 240.000, venta 330.000
+      Descripciones (short_description + description HTML, formato patrón 346)
+      agregadas a los 6. Notas verificadas contra Fragrantica/web oficial
+      (Jouri: pitahaya-cereza-naranja/peonia-frangipani/vainilla-tonka;
+      Hawas Diva: frutas rojas-lichi/rosa-incienso/vainilla-ambar gris;
+      Donna Intense: bergamota-flores/coco-vainilla-sandalo/tonka-ambar;
+      Fahad: pina-mandarina-pimienta/lavanda-azahar/pachuli-ambroxan-incienso;
+      Admiral: cardamomo-pimienta/lavanda-incienso/vainilla-tonka-pachuli;
+      Black Exposed: olibano-toffee/orris-cacao/vainilla-labdano).
+      Imágenes subidas a Storage.
+    - 12 CAMBIOS DE COSTO aplicados con sync-all-prices.js:
+      BAJAS (4):
+        id 354 INVADE MYKONOS: costo 120.000 -> 115.900, venta 190.000 -> 185.000
+        id 130 DUNESCAPE ARMAF: costo 225.000 -> 213.500, venta 315.000 -> 300.000
+        id 250 HAWAS ICE: costo 210.450 -> 201.300, venta 295.000 -> 285.000
+        id 252 HAWAS MALIBU: costo 192.150 -> 189.100, venta 275.000 -> 270.000
+        id 251 HAWAS KOBRA: costo 207.400 -> 189.100, venta 290.000 -> 270.000
+        id 347 HAWAS CHROME: costo 268.400 -> 262.300, venta 365.000 -> 355.000
+        id 152 TERIAQ INTENSE: costo 204.350 -> 170.800, venta 290.000 -> 250.000
+      SUBIDAS (5):
+        id 161 HAYAATI LATTAFA: costo 85.400 -> 97.600, venta 150.000 -> 165.000
+        id 31 CLUB DE NUIT URBAN ELIXIR: costo 210.450 -> 213.500, venta 295.000 -> 300.000
+        id 83 MAYAR ROSA: costo 115.900 -> 122.000, venta 185.000 -> 190.000
+        id 335 ANA ABIYEDH PASSION: costo 100.000 -> 110.000, venta 165.000 -> 180.000
+        id 62 Bade'e Noble Blush: costo 122.000 -> 125.050, venta 190.000 -> 195.000
+    - 0 ELIMINADOS del proveedor.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos,
+      0 cambios de costo, 38 sin match (todos ya ocultos), 2 sin costo
+      (RAYHAAN CORIUM, BOTOX WHITE SALON GOLD), 6 en consulta con precio
+      minorista como costo (los nuevos sin wholesale real).
+  Resultado: 244 total, 210 activas, 34 ocultas. Precios visibles en
+  frontend (viven en Supabase, sin deploy necesario).
+
+- Audit 2026-08-31: proveedor con 4 productos NUEVOS, 4 cambios de costo (SUBIDAS) y 5 ELIMINADOS. Aplicado:
+    - 4 NUEVOS insertados con add-new-provider.mjs:
+      id 159 ANSAAM SILVER (cat 1): costo USD 23.5 -> Gs 143.350, venta 215.000
+      id 362 ISLAND KHADLAJ (cat 1): sin costo -> CONSULTAR
+      id 363 KIT ALISADO PROGRESIVO 1L (cat 1): sin costo -> CONSULTAR
+      id 364 KIT ALISADO PROGRESIVO 500ML (cat 2): sin costo -> CONSULTAR
+      Descripciones (short_description + description HTML) agregadas a los 4. Notas del perfume (Ansaam Silver: cardamomo/bergamota, lavanda/davana, vainilla/ambar/pachuli; Island: pina/iris/jengibre/cipres, coco/maderas, ambar/tonka/sandalo) y del kit de alisado capilar (Salon Gold) creadas.
+    - 4 CAMBIOS DE COSTO (SUBIDAS) aplicados con sync-all-prices.js:
+      id 55 LATTAFA FAKHAR MEN EDP: costo 137.250 -> 146.400, venta 210.000 -> 220.000
+      id 107 Al Haramain Aqua Dubai: costo 262.300 -> 265.350, venta 355.000 -> 360.000
+      id 155 ANGHAM LATTAFA: costo 140.300 -> 146.400, venta 215.000 -> 220.000
+      id 224 JEAN LOWE IMMORTEL: costo 122.000 -> 128.100, venta 190.000 -> 200.000
+    - 5 ELIMINADOS del proveedor ocultados con is_active=false (soft delete):
+      id 54 ASAD BOURBON, id 353 CONQUER - MYKONOS, id 123 ODYSSEY AQUA, id 212 NAJDIA INTENSE, id 231 REYNA.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos, 0 cambios de costo, 39 sin match (todos ya ocultos), 5 en consulta (RAYHAAN CORIUM, BOTOX WHITE SALON GOLD, ISLAND KHADLAJ, KIT ALISADO 1L, KIT ALISADO 500ML).
+  Resultado: 248 total, 209 activas, 39 ocultas. Precios y descripciones visibles en frontend (viven en Supabase, sin deploy necesario).
+
 ======================  PENDIENTE =======================
 
-[ ] Revisar Custom Events (whatsapp_click / add_to_cart) en ~2 semanas y
-     analizar conversión real
+[ ] Custom events NO DISPONIBLES (requiere Vercel Pro). Instalar Google
+     Analytics como alternativa para medir funnel completo
 [ ] Dar de alta el sitemap en Google Search Console
-[ ] Opcional: sección "Bajaron de precio" / "Nuevos" en home (los usuarios ven
-     el catálogo pero solo abren 51/204 productos)
+[ ] Opcional: sección "Lo más visto" / "Nuevos" en home (solo 9/204 prod vistos
+     esta semana)
+[ ] Publicaciones redes: linkear a /product/[id] específico (no al home).
+     FB trae tráfico al catálogo pero no a prod concretos; IG sí llega.
 [ ] Verificar qué pasó el 2026-08-20 (cero tráfico registrado)
 [ ] Aplicar fix de env vars en Vercel (ver INCIDENTE arriba) + redeploy
 [ ] Confirmar deploy OK en Vercel (home debe mostrar productos)
