@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-Tablas: categories (18 filas), products (248 total, 209 activas, 39 ocultas)
+Tablas: categories (18 filas), products (248 total, 207 activas, 41 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -461,21 +461,16 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   frontend (viven en Supabase, sin deploy necesario).
 
 - Audit 2026-08-31: proveedor con 4 productos NUEVOS, 4 cambios de costo (SUBIDAS) y 5 ELIMINADOS. Aplicado:
-    - 4 NUEVOS insertados con add-new-provider.mjs:
-      id 159 ANSAAM SILVER (cat 1): costo USD 23.5 -> Gs 143.350, venta 215.000
-      id 362 ISLAND KHADLAJ (cat 1): sin costo -> CONSULTAR
-      id 363 KIT ALISADO PROGRESIVO 1L (cat 1): sin costo -> CONSULTAR
-      id 364 KIT ALISADO PROGRESIVO 500ML (cat 2): sin costo -> CONSULTAR
-      Descripciones (short_description + description HTML) agregadas a los 4. Notas del perfume (Ansaam Silver: cardamomo/bergamota, lavanda/davana, vainilla/ambar/pachuli; Island: pina/iris/jengibre/cipres, coco/maderas, ambar/tonka/sandalo) y del kit de alisado capilar (Salon Gold) creadas.
+    - 4 NUEVOS del proveedor: se importó ANSAAM SILVER (costo USD 23.5 -> Gs 143.350, venta Gs 215.000) e ISLAND KHADLAJ (en consulta). Los otros 2 productos (KIT ALISADO PROGRESIVO 1L y 500ML) se desactivaron inmediatamente tras el alta (is_active=false) por no ser perfumes.
     - 4 CAMBIOS DE COSTO (SUBIDAS) aplicados con sync-all-prices.js:
-      id 55 LATTAFA FAKHAR MEN EDP: costo 137.250 -> 146.400, venta 210.000 -> 220.000
-      id 107 Al Haramain Aqua Dubai: costo 262.300 -> 265.350, venta 355.000 -> 360.000
-      id 155 ANGHAM LATTAFA: costo 140.300 -> 146.400, venta 215.000 -> 220.000
-      id 224 JEAN LOWE IMMORTEL: costo 122.000 -> 128.100, venta 190.000 -> 200.000
+      id 55 LATTAFA FAKHAR MEN EDP: costo 137.250 -> 146.400, venta Gs 210.000 -> Gs 220.000
+      id 107 Al Haramain Aqua Dubai: costo 262.300 -> 265.350, venta Gs 355.000 -> Gs 360.000
+      id 155 ANGHAM LATTAFA: costo 140.300 -> 146.400, venta Gs 215.000 -> Gs 220.000
+      id 224 JEAN LOWE IMMORTEL: costo 122.000 -> 128.100, venta Gs 190.000 -> Gs 200.000
     - 5 ELIMINADOS del proveedor ocultados con is_active=false (soft delete):
       id 54 ASAD BOURBON, id 353 CONQUER - MYKONOS, id 123 ODYSSEY AQUA, id 212 NAJDIA INTENSE, id 231 REYNA.
-    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos, 0 cambios de costo, 39 sin match (todos ya ocultos), 5 en consulta (RAYHAAN CORIUM, BOTOX WHITE SALON GOLD, ISLAND KHADLAJ, KIT ALISADO 1L, KIT ALISADO 500ML).
-  Resultado: 248 total, 209 activas, 39 ocultas. Precios y descripciones visibles en frontend (viven en Supabase, sin deploy necesario).
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos, 0 cambios de costo, 41 sin match/desactivados (incluye los 2 kits alisados), 3 en consulta activos (RAYHAAN CORIUM, BOTOX WHITE SALON GOLD, ISLAND KHADLAJ).
+  Resultado: 248 total, 207 activas, 41 ocultas. Precios y descripciones visibles en frontend (viven en Supabase, sin deploy necesario).
 
 ======================  PENDIENTE =======================
 
