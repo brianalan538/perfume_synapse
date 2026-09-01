@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-08-31
+Última actualización: 2026-09-01
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-Tablas: categories (18 filas), products (248 total, 207 activas, 41 ocultas)
+Tablas: categories (18 filas), products (249 total, 209 activas, 40 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -472,6 +472,34 @@ FIX EN VERCEL (Project Settings > Environment Variables):
     - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos, 0 cambios de costo, 41 sin match/desactivados (incluye los 2 kits alisados), 3 en consulta activos (RAYHAAN CORIUM, BOTOX WHITE SALON GOLD, ISLAND KHADLAJ).
   Resultado: 248 total, 207 activas, 41 ocultas. Precios y descripciones visibles en frontend (viven en Supabase, sin deploy necesario).
 
+- Audit 2026-09-01: proveedor con 1 producto NUEVO, 8 cambios de costo (3 SUBIDAS + 5 BAJADAS) y 2 ELIMINADOS adicionales. Aplicado:
+    - NUEVO insertado con add-new-provider.mjs:
+      id 365 UOMO INTENSE (EMPER, cat 1): costo USD 22 -> Gs 134.200, venta Gs 205.000
+      Descripciones (short_description + description HTML, formato patrón 346) agregadas.
+      Notas verificadas contra Fragrantica: pomelo-violeta-especias/lavanda-notas marinas-violeta/
+      vetiver-ámbar-almizcle gris. Imagen subida a Storage.
+    - 8 CAMBIOS DE COSTO aplicados con sync-all-prices.js:
+      BAJAS (5):
+        id 357 HAWAS DIVA: costo 250.000 -> 231.800, venta 340.000 -> 320.000
+        id 358 DONNA INTENSE: costo 145.000 -> 134.200, venta 220.000 -> 205.000
+        id 252 HAWAS MALIBU: costo 189.100 -> 176.900, venta 270.000 -> 255.000
+        id 249 HAWAS LONDON: costo 195.200 -> 183.000, venta 280.000 -> 265.000
+        id 253 HAWAS VERDE: costo 250.100 -> 231.800, venta 340.000 -> 320.000 (repuesto, restaurado)
+      SUBIDAS (3):
+        id 235 SALVO EDP: costo 122.000 -> 140.300, venta 190.000 -> 215.000 (repuesto, restaurado)
+        id 236 SALVO ELIXIR: costo 109.800 -> 134.200, venta 180.000 -> 205.000 (repuesto, restaurado)
+        id 84 ARMAF MEGA 100ML: costo 125.000 -> 125.050 (subida mínima, venta sin cambio)
+    - 2 ELIMINADOS del proveedor (verificados: no existen en la API) ocultados con is_active=false:
+      id 47 Bade'e Al Oud Honor And Glory, id 180 LATTAFA KHAMRAH DUKHAN.
+    - 3 REPUESTOS por el proveedor, restaurados con is_active=true (costos ya aplicados arriba):
+      id 235 SALVO EDP, id 236 SALVO ELIXIR, id 253 HAWAS VERDE.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos, 0 cambios de costo,
+      40 sin match (todos ya ocultos/desactivados incluyendo kits), 2 en consulta (RAYHAAN CORIUM,
+      BOTOX WHITE SALON GOLD). id 362 ISLAND KHADLAJ pasó de CONSULTAR a precio visible
+      (costo 175.000, venta 255.000).
+  Resultado: 249 total, 209 activas, 40 ocultas. Precios y descripciones visibles en frontend
+  (viven en Supabase, sin deploy necesario).
+
 ======================  PENDIENTE =======================
 
 [ ] Custom events NO DISPONIBLES (requiere Vercel Pro). Instalar Google
@@ -486,7 +514,7 @@ FIX EN VERCEL (Project Settings > Environment Variables):
 [ ] Confirmar deploy OK en Vercel (home debe mostrar productos)
 [ ] Revisar /admin en producción (login + crear/editar/ocultar un producto)
 [ ] BORRAR src/app/api/diag/route.ts cuando termine el diagnóstico
-[ ] Si el proveedor repone alguno de los 20 retirados: restaurar desde /admin
+[ ] Si el proveedor repone alguno de los retirados: restaurar desde /admin
      y volver a correr scripts/sync-all-prices.js
 [ ] Opcional: ticker de cotizaciones en el home (el proveedor usa USD 6100)
 [ ] Opcional: multi-imagen por producto (image_urls)
