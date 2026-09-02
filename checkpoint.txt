@@ -114,17 +114,17 @@ Archivos JSON originales (data scrapeada):
 
 PRECIOS:
 - Se toma price_wholesale (costo) de Supabase
-- Markup entre 50.000 y 100.000 Gs (proporcional al costo) [cambiado 2026-08-10,
-  antes era 60.000-90.000, y antes 70.000-100.000]
+- Markup entre 65.000 y 115.000 Gs (proporcional al costo) [cambiado 2026-09-02,
+  antes era 50.000-100.000, y antes 60.000-90.000, y antes 70.000-100.000]
 - Redondeo a múltiplo de 5.000 (termina en 000 o 5000)
 - Función: calculateSalePrice() en src/lib/data.ts (y scripts/pricing.js)
-- Aplicado a 220 productos con node scripts/sync-all-prices.js (2026-08-10)
+- Aplicado a 222 productos con node scripts/sync-all-prices.js (2026-09-02)
 
-ESTRATEGIA DE PRECIOS (último análisis: 2026-08-11):
-- CAMBIO DE ESTRATEGIA: ahora SE APLICAN los costos del proveedor en TODOS los
-  casos, tanto SUBIDAS como BAJADAS (antes las bajadas se conservaban para ganar
-  más margen). La ganancia se mantiene entre 50.000 y 100.000 Gs por unidad con
-  la fórmula actual.
+ESTRATEGIA DE PRECIOS (último análisis: 2026-09-02):
+- CAMBIO DE ESTRATEGIA: se aumentó la ganancia +15.000 Gs en TODOS los productos
+  (Markup 50.000-100.000 → 65.000-115.000). La ganancia por unidad ahora es entre
+  65.000 y 115.000 Gs según el costo del producto.
+- Se APLICAN los costos del proveedor en TODOS los casos (SUBIDAS y BAJADAS).
 - IMPORTANTE (2026-08-11): el proveedor pasó a publicar price_wholesale en DÓLARES.
   scripts/pricing.js convierte USD -> Gs con tipo de cambio 6100 (auto-detección:
   si price_wholesale <= 500 es USD y se multiplica por 6100; si > 500 ya viene en
@@ -507,6 +507,13 @@ FIX EN VERCEL (Project Settings > Environment Variables):
       (costo 175.000, venta 255.000).
   Resultado: 249 total, 209 activas, 40 ocultas. Precios y descripciones visibles en frontend
   (viven en Supabase, sin deploy necesario).
+
+- Audit 2026-09-02 (ajuste de márgenes): CAMBIO DE ESTRATEGIA DE PRECIOS — markup
+  aumentado de 50.000-100.000 a 65.000-115.000 Gs (+15.000 ganancia por unidad).
+  Archivos modificados: src/lib/data.ts, scripts/pricing.js.
+  sync-all-prices.js aplicó el nuevo markup a 222 productos activos (costos sin cambios,
+  solo subieron los precios de venta 15.000 Gs cada uno). Precios visibles en frontend
+  (viven en Supabase + código del frontend, requiere deploy).
 
 ======================  PENDIENTE =======================
 

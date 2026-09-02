@@ -2,8 +2,8 @@
 // Fuente de verdad: src/lib/data.ts (calculateSalePrice + regla del primer volumen).
 // TODOS los scripts deben usar este módulo para no desincronizarse con la app.
 
-const MIN_MARKUP = 50000;
-const MAX_MARKUP = 100000;
+const MIN_MARKUP = 65000;
+const MAX_MARKUP = 115000;
 
 // El proveedor publica price_wholesale en USD (valores pequeños). Si el valor es
 // pequeño (<= USD_THRESHOLD) se asume USD y se convierte a Gs. Si ya es un valor
