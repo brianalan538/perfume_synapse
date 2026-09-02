@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-01
+Última actualización: 2026-09-02
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -471,6 +471,14 @@ FIX EN VERCEL (Project Settings > Environment Variables):
       id 54 ASAD BOURBON, id 353 CONQUER - MYKONOS, id 123 ODYSSEY AQUA, id 212 NAJDIA INTENSE, id 231 REYNA.
     - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos, 0 cambios de costo, 41 sin match/desactivados (incluye los 2 kits alisados), 3 en consulta activos (RAYHAAN CORIUM, BOTOX WHITE SALON GOLD, ISLAND KHADLAJ).
   Resultado: 248 total, 207 activas, 41 ocultas. Precios y descripciones visibles en frontend (viven en Supabase, sin deploy necesario).
+
+- Audit 2026-09-02: proveedor con 1 cambio de costo (SUBIDA) y 0 eliminados/repuestos. Aplicado:
+    - 1 CAMBIO DE COSTO (SUBIDA) aplicado con sync-all-prices.js:
+      id 162 N2 MEN MAISON ALHAMBRA: costo 103.700 -> 118.950, venta 170.000 -> 190.000
+    - 0 NUEVOS, 0 ELIMINADOS, 0 REPUESTOS.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync verificado: 0 nuevos,
+      0 cambios de costo, 26 sin match (todos ya ocultos), 1 en consulta (RAYHAAN CORIUM).
+      Precios visibles en frontend (viven en Supabase, sin deploy necesario).
 
 - Audit 2026-09-01: proveedor con 1 producto NUEVO, 8 cambios de costo (3 SUBIDAS + 5 BAJADAS) y 2 ELIMINADOS adicionales. Aplicado:
     - NUEVO insertado con add-new-provider.mjs:
