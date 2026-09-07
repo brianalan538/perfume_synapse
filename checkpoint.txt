@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-02
+Última actualización: 2026-09-07
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-Tablas: categories (18 filas), products (249 total, 209 activas, 40 ocultas)
+  Tablas: categories (18 filas), products (254 total, 209 activas, 45 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -507,6 +507,87 @@ FIX EN VERCEL (Project Settings > Environment Variables):
       (costo 175.000, venta 255.000).
   Resultado: 249 total, 209 activas, 40 ocultas. Precios y descripciones visibles en frontend
   (viven en Supabase, sin deploy necesario).
+
+- Audit 2026-09-03: proveedor SIN cambios reales (0 nuevos, 0 eliminados
+  além de los 26 ya ocultos, 0 cambios de costo). Verificado con
+  compare-prices.js (0 nuevos, 0 cambios de costo, 26 sin match = todos ya
+  ocultos verificado por id, 1 en consulta = RAYHAAN CORIUM) y
+  sync-all-prices.js --dry-run (222 con [=] costo/venta idénticos, 0 reales).
+  Totales Supabase: 249 total, 209 activas, 40 ocultas (sin cambios).
+  Sin nada que aplicar -> sin deploy.
+- Audit 2026-09-04: proveedor SIN cambios reales (0 nuevos, 0 eliminados
+  além de los 28 ya ocultos, 0 cambios de costo). Verificado con
+  compare-prices.js (0 nuevos, 0 cambios de costo, 28 sin match = todos ya
+  ocultos verificado por id, 1 en consulta = RAYHAAN CORIUM) y
+  sync-all-prices.js --dry-run (220 con [=] costo/venta idénticos, 0 reales).
+  Totales Supabase: 249 total, 209 activas, 40 ocultas (sin cambios).
+  Sin nada que aplicar -> sin deploy.
+- Audit 2026-09-05: proveedor con 5 productos NUEVOS, 3 cambios de costo
+  (3 SUBIDAS) y 5 ELIMINADOS. Aplicado:
+    - 5 CAMBIOS DE COSTO aplicados con sync-all-prices.js:
+      SUBIDAS (3):
+        id 1 ASAD BLACK: costo 145.000 -> 165.000, venta 235.000 -> 260.000
+        id 178 ASAD ZANZIBAR LIMITED EDITION: costo 137.250 -> 146.400, venta 225.000 -> 235.000
+        id 179 ASAD ELIXIR: costo 183.000 -> 192.150, venta 280.000 -> 290.000
+      BAJA (1, datos sospechosos del proveedor):
+        id 125 ODYSSEY HOMME WHITE: costo 145.000 -> 14.000, venta 220.000 -> 80.000
+        (el proveedor publicó costo 14.000, parece error de carga; se aplicó por
+        consistencia pero hay que vigilar si lo corrigen)
+    - 5 ELIMINADOS del proveedor (verificados: no existen en la API) ocultados
+      con is_active=false (soft delete):
+      id 358 DONNA INTENSE, id 365 UOMO INTENSE, id 347 HAWAS CHROME - RASASI,
+      id 342 COTTON CANDY - ARMAF, id 67 LATTAFA HAYAATI FLORENCE EDP.
+    - 5 NUEVOS insertados con add-new-provider.mjs (todos con price_wholesale
+      null en proveedor -> quedan en CONSULTAR, venta 0):
+      id 376 MENDOZA (STELLA DASTYN, cat 1): costo 0, venta 0
+      id 372 ALORA L'AFFAIR (L'AFFAIR, cat 2): costo 0, venta 0
+      id 373 MAHIR HONOR (LATTAFA PRIDE, cat 1): costo 0, venta 0
+      id 374 RARE REEF (AFNAN, cat 1): costo 0, venta 0
+      id 377 BETWEEN US (MAISON ALHAMBRA, cat 2): costo 0, venta 0
+      Descripciones (short_description + description HTML, formato patrón 346)
+      agregadas a los 5. Notas verificadas contra Fragrantica/web oficial
+      (Mendoza: pomelo-bergamota-magnolia-jazmín/empolvadas-hierbas-jengibre/
+      iris-patchouli-cedro-ámbar-almizcle; Alora: pitaya/peonía-roja-frangipani/
+      vainilla-patchouli; Maahir Honor: menta-limón-bergamota-tomillo/romero-
+      lavanda-jazmín-moringa/almizcle-cedro-ámbar; Rare Reef: naranja-menta-
+      pomelo-grosella-cilantro/albaricoque-albahaca-violeta-rosa/higo-ambreta-
+      ámbar-dátiles; Between Us: maracuyá-naranja-limón/frangipani-solares/
+      vainilla-benjuí-cisto).
+      Imágenes subidas a Storage.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos,
+      0 cambios de costo, 33 sin match (todos ya ocultos/desactivados), 6 en
+      consulta (RAYHAAN CORIUM + BOTOX WHITE SALON GOLD + los 5 nuevos sin
+      wholesale real).
+  Resultado: 254 total, 209 activas, 45 ocultas. Precios visibles en frontend
+  (viven en Supabase, sin deploy necesario). Los 5 nuevos muestran "Consultar"
+  hasta que el proveedor publique price_wholesale.
+- Audit 2026-09-07: proveedor SIN cambios reales (0 nuevos, 0 eliminados
+  além de los 28 ya ocultos, 0 cambios de costo). 5 productos que estaban
+  en CONSULTAR (sin price_wholesale) ahora publicaron su costo y se aplicaron
+  con sync-all-prices.js:
+    id 376 MENDOZA: costo USD 10 -> Gs 60.000, venta 135.000
+    id 372 ALORA L'AFFAIR: costo USD 40 -> Gs 245.000, venta 350.000
+    id 373 MAHIR HONOR: costo USD 29 -> Gs 175.000, venta 270.000
+    id 374 RARE REEF: costo USD 37 -> Gs 225.000, venta 330.000
+    id 377 BETWEEN US: costo USD 28 -> Gs 170.000, venta 265.000
+  Resto CONSULTAR: solo RAYHAAN CORIUM (sigue sin costo en proveedor).
+  compare-prices.js verificado post-sync: 0 nuevos, 0 cambios de costo,
+  28 sin match (todos ya ocultos), 1 en consulta (RAYHAAN CORIUM).
+  Resultado: 254 total, 209 activas, 45 ocultas. Los 5 ahora tienen precio
+  visible en el frontend (viven en Supabase, sin deploy necesario).
+
+- Limpieza scripts 2026-09-03: borrados 19 scripts viejos sin uso
+  (generadores html/flyers/promos/catálogos, seeds de migración, reportes,
+  sync-prices, previews, pruebas). scripts/ queda solo con la rutina:
+  compare-prices.js, sync-all-prices.js, pricing.js, add-new-provider.mjs
+  + generate-status-pdf.js (nuevo).
+- PDF estados 2026-09-03: scripts/generate-status-pdf.js genera
+  catalogo-status.pdf (páginas 9:16 de 540x960, rectángulos horizontales
+  2x14=28 por pág: foto izq + nombre arriba/precio abajo der, franja de
+  color MASC/FEM/UNI, orden MASC→FEM→UNI).
+  209 activos en 8 páginas, ~622 KB. 2 activos sin foto en DB (cuadro gris):
+  id 261 RAYHAAN WOLF e id 341 WINNER'S TROPHY SILVER (image_url null).
+  Regenerar con el mismo comando tras cada sync de precios.
 
 - Audit 2026-09-02 (ajuste de márgenes): CAMBIO DE ESTRATEGIA DE PRECIOS — markup
   aumentado de 50.000-100.000 a 65.000-115.000 Gs (+15.000 ganancia por unidad).
