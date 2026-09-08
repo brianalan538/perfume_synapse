@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-07
+Última actualización: 2026-09-08
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -575,6 +575,17 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   28 sin match (todos ya ocultos), 1 en consulta (RAYHAAN CORIUM).
   Resultado: 254 total, 209 activas, 45 ocultas. Los 5 ahora tienen precio
   visible en el frontend (viven en Supabase, sin deploy necesario).
+- Audit 2026-09-08: proveedor con 3 productos NUEVOS (cosméticos, no perfumes:
+  2x ALISADO SALON GOLD 0% FORMOL y 1x LUMINOLISS ALISADO PROGRESIVO SIN
+  FORMOL → no agregados) y 2 cambios de costo (SUBIDAS):
+    - id 125 ODYSSEY HOMME WHITE: costo 14.000 -> 170.800 (corrección del
+      proveedor del error anterior del 2026-09-05), venta 80.000 -> 265.000
+    - id 62 Bade'e Noble Blush: costo 125.050 -> 146.400, venta 210.000 -> 235.000
+  0 ELIMINADOS. Resto: 0 cambios pendientes. compare-prices.js post-sync:
+  0 nuevos (cosméticos ignorados), 0 cambios de costo, 38 sin match (todos ya
+  ocultos), 1 en consulta (RAYHAAN CORIUM).
+  Resultado: 254 total, 209 activas, 45 ocultas. Precios visibles en frontend
+  (viven en Supabase, sin deploy necesario).
 
 - Limpieza scripts 2026-09-03: borrados 19 scripts viejos sin uso
   (generadores html/flyers/promos/catálogos, seeds de migración, reportes,
