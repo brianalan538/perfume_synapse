@@ -16,7 +16,7 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
   process.exit(1);
 }
 
-const TARGET_IDS = [365];
+const TARGET_IDS = [];
 const CATEGORY_NAMES = { 1: 'Masculinos', 2: 'Femeninos', 3: 'Unisex' };
 
 async function supabaseFetch(method, pathname, body, prefer) {

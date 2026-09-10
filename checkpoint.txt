@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-08
+Última actualización: 2026-09-10
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-  Tablas: categories (18 filas), products (254 total, 209 activas, 45 ocultas)
+  Tablas: categories (18 filas), products (255 total, 201 activas, 54 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -586,6 +586,36 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   ocultos), 1 en consulta (RAYHAAN CORIUM).
   Resultado: 254 total, 209 activas, 45 ocultas. Precios visibles en frontend
   (viven en Supabase, sin deploy necesario).
+- Audit 2026-09-10: proveedor con 1 producto NUEVO (perfume), 5 cambios de costo
+  (4 SUBIDAS + 1 BAJA), 9 ELIMINADOS activos y 3 cosméticos ignorados. Aplicado:
+    - NUEVO insertado con add-new-provider.mjs:
+      id 375 MOMENTO RIIFFS (RIFFS, cat 1): sin price_wholesale -> CONSULTAR
+      Descripciones (short_description + description HTML, formato patrón 346)
+      agregadas. Notas verificadas contra Fragrantica: bergamota-azafrán-azúcar/
+      rosa de Damasco-oud-tonka/caramelo-madera de ámbar-cedro. Imagen subida a
+      Storage.
+    - 5 CAMBIOS DE COSTO aplicados con sync-all-prices.js:
+      SUBIDAS (4):
+        id 210 NEBRAS: costo 150.000 -> 173.850, venta 225.000 -> 270.000
+        id 47 Bade'e Al Oud Honor And Glory: costo 122.000 -> 125.050, venta 190.000 -> 210.000
+        id 56 LATTAFA KHAMRAH EDP: costo 140.300 -> 152.500, venta 230.000 -> 245.000
+        id 59 9AM POUR FEMME: costo 164.700 -> 170.800, venta 255.000 -> 265.000
+      BAJA (1):
+        id 263 RAYHAAN TROPICAL VIBE: costo 170.800 -> 161.650, venta 265.000 -> 255.000
+    - 9 ELIMINADOS del proveedor (verificados: no existen en la API) ocultados
+      con is_active=false (soft delete):
+      id 220 DARING BLUE FOR LIFE POUR HOMME, id 360 THE PRIDE ADMIRAL,
+      id 131 TAG ROSSO UOMO, id 195 HIS CONFESSION, id 227 YEAH MAN,
+      id 167 LATTAFA RAVE NOWE MASCULINO, id 165 LATTAFA FAKHAR GOLD,
+      id 271 SET 9PM EDP, id 48 Al Haramain Amber Oud Dubai Night Edp 100ml.
+    - 3 cosméticos del proveedor (ALISADO SALON GOLD 0% FORMOL x2,
+      LUMINOLISS ALISADO PROGRESIVO SIN FORMOL) NO agregados (no son perfumes).
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos
+      (cosméticos ignorados), 0 cambios de costo, 35 sin match (todos ya
+      ocultos), 2 en consulta (RAYHAAN CORIUM + MOMENTO RIIFFS).
+  Resultado: 255 total, 201 activas, 54 ocultas. Precios visibles en frontend
+  (viven en Supabase, sin deploy necesario). MOMENTO RIIFFS muestra "Consultar"
+  hasta que el proveedor publique price_wholesale.
 
 - Limpieza scripts 2026-09-03: borrados 19 scripts viejos sin uso
   (generadores html/flyers/promos/catálogos, seeds de migración, reportes,
