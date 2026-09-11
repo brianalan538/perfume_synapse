@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-10
+Última actualización: 2026-09-11
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -616,6 +616,16 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   Resultado: 255 total, 201 activas, 54 ocultas. Precios visibles en frontend
   (viven en Supabase, sin deploy necesario). MOMENTO RIIFFS muestra "Consultar"
   hasta que el proveedor publique price_wholesale.
+
+- Audit 2026-09-11: proveedor con 3 cosméticos (NO perfumes: 2x ALISADO SALON GOLD
+  0% FORMOL, 1x LUMINOLISS ALISADO PROGRESIVO SIN FORMOL → no agregados) y 1 producto
+  que salió de CONSULTAR: MOMENTO RIIFFS (id 375) publicó price_wholesale → costo
+  USD 41 → Gs 250.000, venta Gs 355.000 aplicado con sync-all-prices.js.
+  0 cambios de costo, 0 nuevos, 0 eliminados.
+  compare-prices.js post-sync: 0 nuevos (cosméticos ignorados), 0 cambios de costo,
+  27 sin match (todos ya ocultos), 1 en consulta (RAYHAAN CORIUM).
+  Resultado: 255 total, 201 activas, 54 ocultas. MOMENTO RIIFFS ahora tiene precio
+  visible en frontend (vive en Supabase, sin deploy necesario).
 
 - Limpieza scripts 2026-09-03: borrados 19 scripts viejos sin uso
   (generadores html/flyers/promos/catálogos, seeds de migración, reportes,
