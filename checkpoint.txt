@@ -647,6 +647,10 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   Resultado: 255 total, 201 activas, 54 ocultas (sin cambios en totales).
   RARE REEF ahora tiene precio visible reducido en frontend (vive en Supabase,
   sin deploy necesario).
+  POST-AUDIT: Verificado web del proveedor — RARE REEF (id 374) tiene stock:0
+  (SIN STOCK, imagen desenfocada en su web). Se ocultó con is_active=false
+  (soft delete) ya que si el proveedor no tiene, nosotros tampoco.
+  Resultado final: 255 total, 200 activas, 55 ocultas.
 
 - Limpieza scripts 2026-09-03: borrados 19 scripts viejos sin uso
   (generadores html/flyers/promos/catálogos, seeds de migración, reportes,
