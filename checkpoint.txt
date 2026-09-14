@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-11
+Última actualización: 2026-09-14
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -626,6 +626,27 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   27 sin match (todos ya ocultos), 1 en consulta (RAYHAAN CORIUM).
   Resultado: 255 total, 201 activas, 54 ocultas. MOMENTO RIIFFS ahora tiene precio
   visible en frontend (vive en Supabase, sin deploy necesario).
+
+- Audit 2026-09-13: proveedor SIN cambios reales (0 nuevos perfume, 0 eliminados,
+  0 cambios de costo). 3 cosméticos ignorados (2x ALISADO SALON GOLD 0% FORMOL,
+  1x LUMINOLISS ALISADO PROGRESIVO SIN FORMOL). Verificado con compare-prices.js
+  (0 nuevos, 0 cambios de costo, 27 sin match = todos ya ocultos, 1 en consulta =
+  RAYHAAN CORIUM) y sync-all-prices.js --dry-run (227 con [=] idénticos, 0 reales).
+  Totales Supabase: 255 total, 201 activas, 54 ocultas (sin cambios).
+  Sin nada que aplicar -> sin deploy.
+
+- Audit 2026-09-14: proveedor con 1 cambio de costo (BAJA) y 0 eliminados/repuestos.
+  3 cosméticos ignorados (2x ALISADO SALON GOLD 0% FORMOL, 1x LUMINOLISS ALISADO
+  PROGRESIVO SIN FORMOL → no agregados). Aplicado:
+    - 1 CAMBIO DE COSTO (BAJA) aplicado con sync-all-prices.js:
+      id 374 RARE REEF: costo 225.000 -> 210.450, venta 330.000 -> 310.000
+    - 0 NUEVOS, 0 ELIMINADOS, 0 REPUESTOS.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync verificado: 0 nuevos
+      (cosméticos ignorados), 0 cambios de costo, 28 sin match (todos ya ocultos),
+      1 en consulta (RAYHAAN CORIUM).
+  Resultado: 255 total, 201 activas, 54 ocultas (sin cambios en totales).
+  RARE REEF ahora tiene precio visible reducido en frontend (vive en Supabase,
+  sin deploy necesario).
 
 - Limpieza scripts 2026-09-03: borrados 19 scripts viejos sin uso
   (generadores html/flyers/promos/catálogos, seeds de migración, reportes,
