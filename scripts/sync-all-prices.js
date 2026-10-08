@@ -1,7 +1,7 @@
 // Sincroniza TODOS los precios con el proveedor (subidas y bajadas).
 // Aplica CARGO el costo del proveedor en price_wholesale y volume_options[].price_wholesale,
 // recalcula price (campo de reporte) y volume_options[].price con la fórmula actual de
-// scripts/pricing.js (markup 50.000-100.000 Gs). También actualiza stock.
+// scripts/pricing.js (markup 80.000-130.000 Gs). También actualiza stock.
 const { createClient } = require('@supabase/supabase-js');
 const { WebSocket } = require('ws');
 const https = require('https');

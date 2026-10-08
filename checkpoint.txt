@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-14
+Última actualización: 2026-09-29
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-  Tablas: categories (18 filas), products (255 total, 201 activas, 54 ocultas)
+   Tablas: categories (18 filas), products (264 total, 206 activas, 58 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -652,6 +652,108 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   (soft delete) ya que si el proveedor no tiene, nosotros tampoco.
   Resultado final: 255 total, 200 activas, 55 ocultas.
 
+- Audit 2026-09-16: proveedor SIN cambios reales (0 nuevos perfume, 0 eliminados,
+  0 cambios de costo). 3 cosméticos ignorados (2x ALISADO SALON GOLD 0% FORMOL,
+  1x LUMINOLISS ALISADO PROGRESIVO SIN FORMOL). Verificado con compare-prices.js
+  (0 nuevos, 0 cambios de costo, 27 sin match = todos ya ocultos, 1 en consulta =
+  RAYHAAN CORIUM) y sync-all-prices.js --dry-run (229 con [=] idénticos, 0 reales).
+  Totales Supabase: 259 total, 205 activas, 54 ocultas (sin cambios).
+  Sin nada que aplicar -> sin deploy.
+
+- Audit 2026-09-18: proveedor con 3 productos NUEVOS (perfumes), 8 cambios de
+  costo (4 SUBIDAS + 4 BAJADAS) y 3 cosméticos ignorados (2x ALISADO SALON GOLD
+  0% FORMOL, 1x LUMINOLISS ALISADO PROGRESIVO SIN FORMOL). Aplicado:
+    - 8 CAMBIOS DE COSTO aplicados con sync-all-prices.js:
+      SUBIDAS (4):
+        id 176 BLUE SEDUCTION MASC: costo 128.100 -> 137.250, venta 215.000 -> 225.000
+        id 136 SABAH AL WARD SUGAR: costo 88.450 -> 97.600, venta 170.000 -> 180.000
+        id 168 NAUTICA VOYAGE: costo 97.600 -> 106.750, venta 180.000 -> 190.000
+        id 351 RAYHAAN CORIUM: costo 0 -> 152.500, venta 0 -> 245.000 (salía de CONSULTAR)
+      BAJAS (4):
+        id 272 SET THE KINGDOM: costo 185.000 -> 170.800, venta 280.000 -> 265.000
+        id 281 RAYHAAN NOCTURNO ELIXIR: costo 161.650 -> 152.500, venta 255.000 -> 245.000
+        id 123 ODYSSEY AQUA: costo 164.700 -> 161.650 (venta sin cambio)
+        id 107 Al Haramain Aqua Dubai: costo 265.350 -> 256.200, venta 375.000 -> 365.000
+        id 263 RAYHAAN TROPICAL VIBE: costo 161.650 -> 146.400, venta 255.000 -> 235.000
+    - 3 NUEVOS insertados con add-new-provider.mjs (imágenes subidas a Storage):
+      id 406 ATEEQ NUSUK (NUSUK, cat 1): sin price_wholesale -> CONSULTAR
+      id 407 SET 9PM REBEL (AFNAN, cat 1): sin price_wholesale -> CONSULTAR
+      id 408 SET 9AM DIVE (AFNAN, cat 1): sin price_wholesale -> CONSULTAR
+      Descripciones pendientes (short_description + description HTML).
+    - 3 COSMÉTICOS del proveedor ocultados con is_active=false (soft delete):
+      id 384 ALISADO SALON GOLD 0% FORMOL, id 385 ALISADO SALON GOLD 0% FORMOL,
+      id 386 LUMINOLISS ALISADO PROGRESIVO SIN FORMOL.
+    - 0 ELIMINADOS, 0 REPUESTOS.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 3 cosméticos
+      nuevos (ya ocultos), 0 cambios de costo, 28 sin match (todos ya ocultos),
+      3 en consulta (los 3 nuevos sin wholesale real).
+  Resultado: 262 total, 208 activas, 54 ocultas. Precios visibles en frontend
+  (viven en Supabase, sin deploy necesario). Los 3 nuevos muestran "Consultar"
+  hasta que el proveedor publique price_wholesale.
+
+- Audit 2026-09-15: proveedor con 4 productos NUEVOS (perfumes), 9 cambios de
+  costo (4 SUBIDAS + 5 BAJADAS) y 0 eliminados. 3 cosméticos ignorados
+  (2x ALISADO SALON GOLD 0% FORMOL, 1x LUMINOLISS ALISADO PROGRESIVO SIN
+  FORMOL → no agregados). Aplicado:
+    - 4 NUEVOS insertados con add-new-provider.mjs (imágenes subidas a Storage):
+      id 402 FREEZE (RIIFFS, cat 3 Unisex): costo USD 47 -> Gs 285.000, venta 400.000
+      id 403 NITRO RED INTENSELY (DUMONT, cat 3 Unisex): costo USD 36 -> Gs 219.600, venta 320.000
+      id 404 JEAN LOWE FANTASME (MAISON ALHAMBRA, cat 1): costo USD 23 -> Gs 140.300, venta 230.000
+      id 405 REFLECTION - MYKONOS (MYKONOS, cat 1): costo USD 20 -> Gs 120.000, venta 205.000
+      Descripciones (short_description + description HTML, formato patrón 346)
+      agregadas a los 4. Notas verificadas contra Fragrantica/web oficial
+      (Freeze: menta-bergamota-toronja/jengibre-té-salvia/Ambermax-cedro-peonía;
+      Nitro Red Intensely: bergamota-manzana-melón/ámbar-sal marina-cedro/
+      sándalo-patchouli-musgo; Jean Lowe Fantasme: citron-bergamota-naranja/
+      neroli-jengibre-canela/té negro-ambroxan-guayacán-olibano [inspirada en
+      LV Imagination]; Reflection: pomelo-jengibre-bergamota/notas marinas-
+      cardamomo-lila/musgo-patchouli-ámbar-ambroxan [inspirada en LV Symphony]).
+    - 9 CAMBIOS DE COSTO aplicados con sync-all-prices.js:
+      SUBIDAS (4):
+        id 28 CLUB DE NUIT PRECIEUX: costo 265.000 -> 274.500, venta 360.000 -> 385.000
+        id 187 QAED AL FURSAN: costo 106.750 -> 109.800, venta 190.000 -> 195.000
+        id 60 LATTAFA ECLAIRE EDP: costo 195.200 -> 207.400, venta 295.000 -> 305.000
+        id 357 HAWAS DIVA: costo 231.800 -> 213.500, venta 335.000 -> 315.000
+      BAJAS (5):
+        id 99 9PM NIGHT OUT - AFNAN: costo 286.700 -> 280.600, venta 400.000 -> 390.000
+        id 359 FAHAD: costo 220.000 -> 219.600 (venta sin cambio)
+        id 375 MOMENTO RIIFFS: costo 250.000 -> 219.600, venta 355.000 -> 320.000
+        id 373 MAHIR HONOR: costo 175.000 -> 155.550, venta 270.000 -> 245.000
+        id 377 BETWEEN US: costo 170.000 -> 152.500, venta 265.000 -> 245.000
+        id 175 FANTASY BRITNEY SPEARS: costo 155.550 -> 146.400, venta 245.000 -> 235.000
+        id 250 HAWAS ICE: costo 201.300 -> 198.250, venta 300.000 -> 295.000
+    - 0 ELIMINADOS, 0 REPUESTOS.
+    - Resto: 0 cambios pendientes. compare-prices.js post-sync: 0 nuevos
+      (cosméticos ignorados), 0 cambios de costo, 27 sin match (todos ya
+      ocultos), 1 en consulta (RAYHAAN CORIUM).
+  Resultado: 259 total, 205 activas, 54 ocultas. Precios visibles en frontend
+  (viven en Supabase, sin deploy necesario).
+
+- Audit 2026-09-21: proveedor SIN cambios reales (0 nuevos perfume, 0 eliminados,
+  0 cambios de costo). 3 cosméticos ignorados (2x ALISADO SALON GOLD 0% FORMOL,
+  1x LUMINOLISS ALISADO PROGRESIVO SIN FORMOL → no agregados). Verificado con
+  compare-prices.js (0 nuevos, 0 cambios de costo, 28 sin match = todos ya
+  ocultos, 0 en consulta) y sync-all-prices.js --dry-run (230 con [=] idénticos,
+  0 reales). Totales Supabase: 262 total, 208 activas, 54 ocultas (sin cambios).
+  Sin nada que aplicar → sin deploy.
+
+- Audit 2026-09-22: proveedor SIN cambios de costo (0 cambios), 0 nuevos perfume
+  y 3 ELIMINADOS. 3 cosméticos ignorados (mismos 384/385/386 mal categorizados
+  como Femeninos por el proveedor → no agregados). Verificado con
+  compare-prices.js (0 cambios de costo, 3 nuevos = cosméticos ignorados,
+  28 sin match, 0 en consulta) y sync-all-prices.js --dry-run (230 con [=]
+  por orden de claves de volume_options, 0 reales normalizados). Aplicado:
+    - 3 ELIMINADOS del proveedor (verificados: no existen en /public/products
+      ni en otra categoría) ocultados con is_active=false (soft delete):
+      id 343 THE ICON EDT, id 130 DUNESCAPE ARMAF, id 265 SO CANDID POUR FEMME.
+    - 3 cosméticos NUEVOS del proveedor (id 384/385 ALISADO SALON GOLD 0% FORMOL
+      y 386 LUMINOLISS ALISADO PROGRESIVO) NO agregados — son alisados,
+      el proveedor los publicó en cat 2 Femeninos por error.
+  Resultado: 262 total, 204 activas, 58 ocultas. compare-prices.js verificado
+  post-cambios: 0 cambios pendientes, 28 sin match (todos ya ocultos), 0 en
+  consulta, 3 cosméticos ignorados. Sin cambios de código ni precios visibles
+  → sin deploy (datos viven en Supabase).
+
 - Limpieza scripts 2026-09-03: borrados 19 scripts viejos sin uso
   (generadores html/flyers/promos/catálogos, seeds de migración, reportes,
   sync-prices, previews, pruebas). scripts/ queda solo con la rutina:
@@ -669,10 +771,318 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   aumentado de 50.000-100.000 a 65.000-115.000 Gs (+15.000 ganancia por unidad).
   Archivos modificados: src/lib/data.ts, scripts/pricing.js.
   sync-all-prices.js aplicó el nuevo markup a 222 productos activos (costos sin cambios,
-  solo subieron los precios de venta 15.000 Gs cada uno). Precios visibles en frontend
-  (viven en Supabase + código del frontend, requiere deploy).
+   solo subieron los precios de venta 15.000 Gs cada uno). Precios visibles en frontend
+   (viven en Supabase + código del frontend, requiere deploy).
 
-======================  PENDIENTE =======================
+- Audit 2026-09-25: proveedor con 2 productos NUEVOS (perfumes), 0 cambios de
+  costo, 0 eliminados. 3 cosméticos ignorados (384/385 ALISADO SALON GOLD 0%
+  FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN FORMOL, mal categorizados como
+  Femeninos por el proveedor → no agregados). Aplicado:
+    - 2 NUEVOS insertados con add-new-provider.mjs (TARGET_IDS=[409,410],
+      reseteado a [] después; imágenes subidas a Storage). Ambos sin
+      price_wholesale en proveedor → quedan en CONSULTAR (venta 0):
+      id 409 ERBA PURA (XERJOFF, cat 3 Unisex)
+      id 410 VALENTINO UOMO BORN IN ROMA INTENSE (VALENTINO, cat 1 Masculinos)
+      Descripciones (short_description + description HTML, formato patrón 346)
+      agregadas a los 2. Notas verificadas contra Fragrantica (Erba Pura:
+      naranja siciliana-bergamota-limón/frutas/almizcle-vainilla-ámbar;
+      Born in Roma Intense: vainilla bourbon/lavandín/vetiver).
+    - Resto: 0 cambios pendientes. compare-prices.js post-alta: 3 nuevos
+      (solo cosméticos ignorados), 0 cambios de costo, 28 sin match (todos ya
+      ocultos), 2 en consulta (409 + 410).
+  Resultado: 264 total, 206 activas, 58 ocultas. Los 2 nuevos muestran
+  "Consultar" en el frontend (viven en Supabase, sin deploy necesario).
+
+- Audit 2026-09-28: proveedor con 1 cambio de costo (SUBIDA), 0 nuevos perfume,
+  0 eliminados. 3 cosméticos ignorados (384/385 ALISADO SALON GOLD 0% FORMOL,
+  386 LUMINOLISS ALISADO PROGRESIVO SIN FORMOL, mal categorizados como
+  Femeninos por el proveedor → no agregados). Aplicado con update dirigido
+  (NO se corrió sync-all-prices.js completo: su fallback price→costo habría
+  sacado de CONSULTAR a 409/410 con el precio minorista como costo):
+    - id 362 ISLAND KHADLAJ: costo USD 30 → Gs 175.000 -> 183.000,
+      venta 270.000 -> 280.000.
+    - Stock sincronizado (solo /admin, sin impacto público): id 357 HAWAS
+      DIVA 11->10, id 135 SABAH AL WARD 12->11, id 140 DURRAT AL AROOS
+      15->14, id 232 PHILOS PURA 12->11, id 42 AMBER OUD GOLD 9->8.
+    - 409 ERBA PURA y 410 VALENTINO BORN IN ROMA INTENSE siguen sin
+      price_wholesale en proveedor (solo price minorista 910.000/800.000)
+      → se mantienen en CONSULTAR.
+    - 28 sin match verificados: los 28 ya están ocultos (0 activos).
+  compare-prices.js post-cambios: 0 cambios de costo, 3 nuevos (solo
+  cosméticos ignorados), 28 sin match (todos ya ocultos), 2 en consulta
+  (409 + 410).
+   Resultado: 264 total, 206 activas, 58 ocultas. Precio visible en
+   frontend (vive en Supabase, sin deploy necesario; sin cambios de código
+   → sin commit).
+
+- Audit 2026-09-29: proveedor con 1 cambio de costo (BAJA), 2 REPUESTOS,
+  0 nuevos perfume, 0 eliminados nuevos. 3 cosméticos ignorados (384/385
+  ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN
+  FORMOL, mal categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido (NO se corrió sync-all-prices.js completo:
+  su fallback price→costo habría sacado de CONSULTAR a 409/410 con el
+  precio minorista como costo — el dry-run los marcaba [SUBIO] 0->910.000
+  y 0->800.000):
+    - id 123 ODYSSEY AQUA (REPUESTO, estaba oculto desde 2026-08-31):
+      costo USD 24.5 → Gs 161.650 -> 149.450, venta 255.000 -> 240.000,
+      restaurado is_active=true. Stock 19 (= proveedor).
+    - id 231 REYNA (REPUESTO, estaba oculto desde 2026-08-31): volvió al
+      catálogo del proveedor con el MISMO costo (USD 17.5 → Gs 106.750,
+      venta 190.000 sin cambio), restaurado is_active=true. Stock 1
+      (= proveedor). Caso idéntico al patrón 2026-08-23 (costos ya
+      coincidían); este repuesto era invisible en compare (sin cambio de
+      costo) y en dry-run ([=]), se detectó cruzando ocultos vs IDs del
+      proveedor.
+    - 409 ERBA PURA y 410 VALENTINO BORN IN ROMA INTENSE siguen sin
+      price_wholesale en proveedor (solo price minorista 910.000/800.000)
+      → se mantienen en CONSULTAR.
+    - 28 sin match verificados: los 28 ya están ocultos (0 activos).
+  compare-prices.js post-cambios: 0 cambios de costo, 3 nuevos (solo
+  cosméticos ignorados), 28 sin match (todos ya ocultos), 2 en consulta
+  (409 + 410).
+  Resultado: 264 total, 208 activas, 56 ocultas. Precios visibles en
+   frontend (viven en Supabase, sin deploy necesario; sin cambios de código
+   → sin commit).
+   NOTA: hay ~30 productos ocultos cuyos IDs existen en el proveedor con el
+   mismo nombre (repuestos no restaurados: ej. 28, 47, 60, 99, 358, 365,
+   347, 67...). Las auditorías 09-15/09-18 les aplicaron costos sin
+   restaurarlos. Política pendiente de definir: restauración masiva vs
+   mantener ocultos (varios tienen stock bajo/cero en proveedor, ej. 47 y
+   374 con stock 0). Por ahora se restauran solo repuestos del delta del
+   día con stock sano.
+
+- Audit 2026-09-30: proveedor SIN cambios reales (0 nuevos perfume, 0
+  eliminados, 0 cambios de costo). 3 cosméticos ignorados (384/385
+  ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN
+  FORMOL, mal categorizados como Femeninos por el proveedor → no
+  agregados). Verificado con compare-prices.js (0 cambios de costo,
+  3 nuevos = solo cosméticos ignorados, 28 sin match = todos ya ocultos
+  verificado 0 activos, 2 en consulta = 409 + 410) y sync-all-prices.js
+  --dry-run (232 con [=] costo/venta idénticos; los 2 únicos [SUBIO]
+  son 409 ERBA PURA 0->910.000 y 410 VALENTINO BORN IN ROMA INTENSE
+  0->800.000 por el fallback price→costo del script — ambos siguen sin
+  price_wholesale en proveedor (solo price minorista) → se mantienen en
+  CONSULTAR; NO se corrió el sync completo por esa trampa).
+  Aplicado update dirigido de stock (solo /admin, sin impacto público):
+    - id 161 HAYAATI LATTAFA 15->14 (= proveedor).
+  409/410 siguen sin wholesale → en CONSULTAR. 3 activos con stock 0 en
+  proveedor (247 NITRO RED, 236 SALVO ELIXIR, 31 CLUB DE NUIT URBAN
+  ELIXIR, todos is_active=true en proveedor): NO son eliminados según
+  la rutina → se dejan visibles; confirmar en próxima auditoría (si
+  siguen en 0 → ocultar según precedente RARE REEF 09-14).
+  Resultado: 264 total, 208 activas, 56 ocultas (sin cambios en
+  totales). Sin cambios de código ni precios visibles → sin commit
+  ni deploy (datos viven en Supabase).
+
+- Audit 2026-10-01: proveedor con 2 productos NUEVOS (perfumes), 1 cambio
+  de costo (BAJA) y 0 eliminados. 4 cosméticos ignorados (384/385
+  ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN
+  FORMOL, 413 SPRAY FIJADOR EXTRA FUERTE SILHOUETTE SCHWARZKOPF, mal
+  categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido + add-new-provider.mjs (TARGET_IDS=[411,412],
+  reseteado a [] después; NO se corrió sync-all-prices.js completo: su
+  fallback price→costo habría sacado de CONSULTAR a 409/410/411/412 con
+  el precio minorista como costo — el dry-run los marcaba [SUBIO]):
+    - 2 NUEVOS insertados con add-new-provider.mjs (imágenes subidas a
+      Storage). Ambos sin price_wholesale en proveedor → quedan en
+      CONSULTAR (venta 0):
+      id 411 STALLION 53 (EMPER, cat 3 Unisex, stock 3)
+      id 412 ROME LA BOMBA (BHARARA BEAUTY, cat 2 Femeninos, stock 3)
+      Descripciones (short_description + description HTML, formato patrón
+      346) agregadas a los 2. Notas verificadas (Stallion 53 vs
+      Fragrantica: cardamomo-violeta/ámbar-iris/sándalo-cuero-cedro
+      Virginia-papiro, oriental amaderado inspirado en Santal 33;
+      Rome La Bomba vs web oficial Bharara Beauty: fruta del dragón/
+      peonía-frangipani/vainilla-pachulí, frutal floral femenino).
+    - 1 CAMBIO DE COSTO (BAJA) aplicado con update dirigido:
+      id 375 MOMENTO RIIFFS: costo USD 33.5 → Gs 219.600 -> 204.350,
+      venta 320.000 -> 305.000. Stock 1 (= proveedor, sin cambio).
+    - Stock sincronizado (solo /admin, sin impacto público):
+      id 83 MAYAR ROSA 11->10, id 170 CALVIN KLEIN ONE MEN 8->7.
+    - 409 ERBA PURA y 410 VALENTINO BORN IN ROMA INTENSE siguen sin
+      price_wholesale en proveedor (solo price minorista 910.000/800.000)
+      → se mantienen en CONSULTAR.
+    - 28 sin match verificados: los 28 ya están ocultos (0 activos).
+  compare-prices.js post-cambios: 0 cambios de costo, 4 nuevos (solo
+  cosméticos ignorados 384/385/386/413), 28 sin match (todos ya ocultos),
+  4 en consulta (409 + 410 + 411 + 412).
+  Resultado: 266 total, 210 activas, 56 ocultas. Precios y descripciones
+  visibles en frontend (viven en Supabase, sin deploy necesario; sin
+  cambios de código → sin commit).
+
+- Audit 2026-10-06: proveedor con 2 productos NUEVOS (perfumes), 6 cambios
+  de costo (1 SUBIDA + 5 BAJADAS) y 2 ELIMINADOS. 4 cosméticos ignorados
+  (384/385 ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO
+  SIN FORMOL, 413 SPRAY FIJADOR EXTRA FUERTE SILHOUETTE SCHWARZKOPF, mal
+  categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido + add-new-provider.mjs (TARGET_IDS=[414,415],
+  reseteado a [] después; NO se corrió sync-all-prices.js completo: su
+  fallback price→costo habría sacado de CONSULTAR a 409/410/411/412/414/415
+  con el precio minorista como costo — el dry-run los marcaba [SUBIO]):
+    - 2 NUEVOS insertados con add-new-provider.mjs (imágenes subidas a
+      Storage). Ambos sin price_wholesale en proveedor → quedan en
+      CONSULTAR (venta 0):
+      id 414 Y EDP YVES SAINT LAURENT (cat 1 Masculinos, stock 3, 100ml)
+      id 415 ATLAS (LATTAFA, cat 1 Masculinos, stock 3, 55ml)
+      Descripciones (short_description + description HTML, formato patrón
+      346, sin tildes por encoding del shell) agregadas a los 2. Notas
+      verificadas (Y EDP vs web oficial/Fragrantica: bergamota-manzana-
+      jengibre/salvia-geranio-enebro/amberwood-tonka-cedro-vetiver,
+      fougère amaderada; Atlas vs web oficial Lattafa: sal-notas marinas-
+      limón/iris-davana/ámbar gris-sándalo-musgo de roble, acuática
+      amaderada 2024).
+    - 6 CAMBIOS DE COSTO aplicados con update dirigido (misma lógica del
+      sync: costo + venta recalculada + volume_options + stock):
+      SUBIDA (1):
+        id 222 LA ROUGE BAROQUE EXTREME: costo USD 16.5 → Gs 88.450 -> 100.650,
+        venta 170.000 -> 180.000. Stock 12 (= proveedor).
+      BAJAS (5):
+        id 99 9PM NIGTH OUT - AFNAN: costo USD 41.5 → Gs 280.600 -> 253.150,
+        venta 390.000 -> 360.000. Stock 11 (= proveedor, sigue oculto).
+        id 250 HAWAS ICE: costo USD 32 → Gs 198.250 -> 195.200,
+        venta 295.000 sin cambio. Stock 12 (= proveedor).
+        id 251 HAWAS KOBRA: costo USD 29 → Gs 189.100 -> 176.900,
+        venta 285.000 -> 270.000. Stock 12 (= proveedor).
+        id 252 HAWAS MALIBU: costo USD 27.5 → Gs 176.900 -> 167.750,
+        venta 270.000 -> 260.000. Stock 18 (= proveedor).
+        id 347 HAWAS CHROME - RASASI: costo USD 39 → Gs 262.300 -> 237.900,
+        venta 370.000 -> 345.000. Stock 20 (= proveedor, sigue oculto).
+    - 2 ELIMINADOS del proveedor (verificados: no existen en /public/products
+      en ninguna categoría) ocultados con is_active=false (soft delete):
+      id 214 CONFIDENTIAL GOLD, id 254 HAWAS BLACK.
+    - Stock sincronizado (solo /admin, sin impacto público, 13 activos):
+      id 24 19->18, id 176 12->11, id 110 10->9, id 162 10->9,
+      id 194 12->11, id 136 11->10, id 65 12->11, id 145 19->18,
+      id 161 14->13, id 199 11->10, id 253 HAWAS VERDE 2->9 (reposición),
+      id 96 16->14, id 55 16->15.
+    - 0 REPUESTOS nuevos (los 28 ocultos que existen en el proveedor son los
+      mismos de auditorías anteriores → se mantienen ocultos según política
+      2026-09-29).
+    - 409/410/411/412 siguen sin price_wholesale en proveedor → en CONSULTAR.
+  compare-prices.js post-cambios: 0 cambios de costo, 4 nuevos (solo
+  cosméticos ignorados 384/385/386/413), 30 sin match (0 activos),
+  6 en consulta (409 + 410 + 411 + 412 + 414 + 415).
+  Resultado: 268 total, 210 activas, 58 ocultas. Precios y descripciones
+  visibles en frontend (viven en Supabase, sin deploy necesario; sin
+  cambios de código → sin commit).
+  NOTA git: el working tree local tiene cambios preexistentes no relacionados
+  (AGENTS.md, package.json/lock, scripts borrados, PDFs/catalogs untracked)
+  que NO son de esta auditoría → no se commitea nada.
+
+- Audit 2026-10-07: proveedor SIN cambios de costo (0 cambios), 0 nuevos
+  perfume y 0 ELIMINADOS. 4 cosméticos ignorados (384/385 ALISADO SALON
+  GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN FORMOL, 413 SPRAY
+  FIJADOR EXTRA FUERTE SILHOUETTE SCHWARZKOPF, mal categorizados como
+  Femeninos por el proveedor → no agregados). Verificado con
+  compare-prices.js (0 cambios de costo, 4 nuevos = solo cosméticos
+  ignorados, 30 sin match = todos ya ocultos verificado 0 activos,
+  6 en consulta = 409 + 410 + 411 + 412 + 414 + 415) y
+  sync-all-prices.js --dry-run (234 con [=] costo/venta idénticos; los 6
+  únicos [SUBIO] son 409/410/411/412/414/415 por el fallback
+  price→costo del script — todos siguen con price_wholesale=null en
+  proveedor (solo price minorista) → se mantienen en CONSULTAR; NO se
+  corrió el sync completo por esa trampa).
+  Aplicado update dirigido de stock (solo /admin, sin impacto público,
+  misma lógica del sync pero sin tocar precios; nunca saca de CONSULTAR):
+    - Stock producto + vols (12): id 375 MOMENTO RIIFFS 1->0, id 24 18->17,
+      id 357 HAWAS DIVA 10->9, id 119 15->14, id 252 18->17, id 72 12->10,
+      id 410 VALENTINO BORN IN ROMA 2->1 (sigue en CONSULTAR, precio intacto),
+      ocultos id 358 DONNA INTENSE 3->1, id 28 CLUB DE NUIT PRECIEUX 20->19,
+      id 365 UOMO INTENSE 8->7, id 224 JEAN LOWE IMMORTEL 8->7,
+      id 99 9PM NIGTH OUT 11->10, id 166 LATTAFA FAKHAR ROSE 1->0.
+    - Stock solo-vols (18 activos, producto ya coincidía): id 42, 176, 83,
+      110, 162, 194, 136, 65, 140, 135, 145, 161, 199, 232, 170, 253, 96, 55.
+    - 0 REPUESTOS nuevos (los 28 ocultos que existen en el proveedor son los
+      mismos de auditorías anteriores, todos con costo idéntico → se mantienen
+      ocultos según política 2026-09-29).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina, vigilar):
+  375 MOMENTO RIIFFS (nuevo en 0, era 1), 247 NITRO RED, 236 SALVO ELIXIR,
+  31 CLUB DE NUIT URBAN ELIXIR (los 3 ya estaban en 0 desde 2026-09-30).
+  Verificación post-cambios: costo distinto=0, stock distinto=0,
+  compare-prices limpio (0/4-cosméticos/30-ocultos/6-consulta).
+   Resultado: 268 total, 210 activas, 58 ocultas (sin cambios en totales).
+   Sin cambios de código ni precios visibles → sin commit ni deploy
+   (datos viven en Supabase).
+
+- Audit 2026-10-08: proveedor con 4 productos NUEVOS (perfumes), 3 REPUESTOS
+  con cambio de costo (1 SUBIDA + 1 BAJADA + 1 SUBIDA con fallback) y
+  2 ELIMINADOS activos. 5 cosméticos ignorados (384/385 ALISADO SALON GOLD
+  0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN FORMOL, 413 SPRAY
+  FIJADOR SILHOUETTE + 420 RETINAL SHOT CELIMAX nuevo cosmético, mal
+  categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido + add-new-provider.mjs (TARGET_IDS=
+  [111,419,422,423], reseteado a [] después; NO se corrió
+  sync-all-prices.js completo: su fallback price→costo habría sacado de
+  CONSULTAR a los 10 en consulta — el dry-run los marcaba [SUBIO]):
+    - 4 NUEVOS insertados con add-new-provider.mjs (imágenes subidas a
+      Storage). Todos sin price_wholesale en proveedor → quedan en
+      CONSULTAR (venta 0):
+      id 419 RAYHAAN AZUL (RAYHAAN, cat 1 Masculinos, stock 2, 100ml)
+      id 111 SUPREMACY COLLECTOR'S EDITION (AFNAN, cat 1, stock 12, 100ml)
+      id 422 LIGHT BLUE FEM (DOLCE & GABBANA, cat 2 Femeninos, stock 2)
+      id 423 LE BEAU LE PARFUM (JEAN PAUL GAULTIER, cat 1, stock 2, 125ml)
+      Descripciones (short_description + description HTML, formato patrón
+      346, sin tildes por encoding del shell) agregadas a los 4. Notas
+      verificadas (Azul vs web oficial Rayhaan/Fragrantica: bergamota-
+      limón/flor de toronja/calone-sándalo, aromática acuática 2026;
+      Collector's Edition vs web oficial Afnan: piña-bergamota-manzana-
+      flores blancas/flor de azahar-abedul-ámbar/musgo-roble-almizcle-
+      ámbar gris; Light Blue Fem clásico D&G: limón siciliano-manzana/
+      bambú-jazmín-rosa blanca/cedro-almizcle-ámbar; Le Beau Le Parfum:
+      piña-iris-ciprés-jengibre/coco-cashmeran/tonka-vainilla-sándalo-
+      ámbar).
+    - 3 REPUESTOS (estaban ocultos, volvieron al catálogo del proveedor),
+      restaurados con is_active=true + costo/venta/stock actualizados:
+      SUBIDA: id 274 9PM REBEL - AFNAN: costo USD 39.5 → Gs 235.000 ->
+      240.950, venta 320.000 -> 345.000. Stock 12 (= proveedor).
+      BAJA: id 127 ODYSSEY GO MANGO: costo USD 19 → Gs 134.200 ->
+      115.900, venta 205.000 -> 200.000. Stock 2 (= proveedor).
+      SUBIDA (sin wholesale, fallback price): id 360 THE PRIDE ADMIRAL:
+      costo 175.000 -> 215.000, venta 270.000 -> 315.000. Stock 3.
+    - 2 ELIMINADOS del proveedor (verificados 2 veces con 335 productos
+      estables: no existen en /public/products en ninguna categoría)
+      ocultados con is_active=false (soft delete):
+      id 231 REYNA (activo, restaurado el 2026-09-29, el proveedor lo
+      volvió a sacar), id 260 ATTAR AL WESAL GOLD (activo, stock 1).
+      NOTA: 215 LA VIVACITE y 218 ROSE SEDUCTION también salieron del
+      proveedor en la misma ventana (338->335 productos entre corridas)
+      pero ya estaban ocultos → sin acción.
+    - Stock sincronizado (solo /admin, sin impacto público): id 71 HAWAS
+      FOR HIM 12->11 (= proveedor, producto + vols).
+    - 420 RETINAL SHOT CELIMAX (cosmético/skincare, cat 2 por error del
+      proveedor) NO agregado.
+    - 409/410/411/412/414/415 + 4 nuevos siguen sin price_wholesale en
+      proveedor → en CONSULTAR (10 en consulta).
+  compare-prices.js post-cambios: 0 cambios de costo, 5 nuevos (solo
+  cosméticos ignorados 384/385/386/413/420), 29 sin match (0 activos),
+  10 en consulta.
+  Resultado: 272 total, 215 activas, 57 ocultas. Precios y descripciones
+  visibles en frontend (viven en Supabase, sin deploy necesario; sin
+  cambios de código → sin commit).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina):
+  375 MOMENTO RIIFFS, 247 NITRO RED, 236 SALVO ELIXIR,
+  31 CLUB DE NUIT URBAN ELIXIR (los 4 iguales desde 2026-09-30).
+  NOTA git: el working tree local tiene cambios preexistentes no
+  relacionados (AGENTS.md, package.json/lock, scripts borrados,
+  PDFs/catalogs untracked) que NO son de esta auditoría → no se
+  commitea nada (igual que 2026-10-06).
+
+- Cambio de estrategia 2026-10-08: AUMENTO DE MARGEN +15.000 Gs en TODOS
+  los productos (markup 65.000-115.000 → 80.000-130.000). Como 15.000 es múltiplo de 5.000, la suba es EXACTA
+  en cada producto (verificado: 249 dan +15.000 justo; 13 ocultos con
+  precio almacenado desactualizado quedaron con el valor correcto de la
+  fórmula nueva, ej. 22, 54, 212, 228, 25).
+  Archivos modificados: src/lib/data.ts, scripts/pricing.js
+  (+ comentario en sync-all-prices.js).
+  Precios almacenados recalculados en Supabase: 262 productos
+  (price + volume_options[].price; costos/stock/is_active intactos).
+  Los 10 en CONSULTAR siguen en 0 (la fórmula devuelve 0 si costo<=0).
+  Verificado: npm run build OK (lint solo tiene 1 error preexistente en
+  temp_run.js untracked + warnings de <img> preexistentes).
+  Requiere deploy (la fórmula vive en el código del frontend) → commit
+  + push a main.
+
+  ======================  PENDIENTE =======================
 
 [ ] Custom events NO DISPONIBLES (requiere Vercel Pro). Instalar Google
      Analytics como alternativa para medir funnel completo
