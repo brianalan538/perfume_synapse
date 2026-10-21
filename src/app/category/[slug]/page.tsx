@@ -1,9 +1,49 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import CategoryContent from './content';
 import { getCategoryBySlug, getProductsByCategory } from '@/lib/data';
 
-export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+const SITE_URL = 'https://perfume-synapse.vercel.app';
+
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const [category, products] = await Promise.all([
+    getCategoryBySlug(slug),
+    getProductsByCategory(slug),
+  ]);
+
+  if (!category) {
+    return { title: 'Categoría no encontrada | SYNAPSE DIGITAL' };
+  }
+
+  const name = category.name;
+  const title = `Perfumes ${name} | SYNAPSE DIGITAL`;
+  const description = `Descubrí ${products.length} perfumes ${name.toLowerCase()} originales en SYNAPSE DIGITAL. Envíos a todo Paraguay.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `${SITE_URL}/category/${slug}` },
+    openGraph: {
+      type: 'website',
+      siteName: 'SYNAPSE DIGITAL',
+      title,
+      description,
+      url: `${SITE_URL}/category/${slug}`,
+      locale: 'es_PY',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
+
+export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
   const [category, catProducts] = await Promise.all([
     getCategoryBySlug(slug),

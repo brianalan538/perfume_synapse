@@ -27,20 +27,11 @@ export const metadata: Metadata = {
     description: "Fragancias árabes originales para quienes buscan calidad, estilo y distinción.",
     url: "https://perfume-synapse.vercel.app",
     locale: "es_PY",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "SYNAPSE DIGITAL - Fragancias árabes originales",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "SYNAPSE DIGITAL",
     description: "Fragancias árabes originales para quienes buscan calidad, estilo y distinción.",
-    images: ["/og-image.png"],
   },
 };
 
