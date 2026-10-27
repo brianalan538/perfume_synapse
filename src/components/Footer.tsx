@@ -6,7 +6,10 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">SYNAPSE DIGITAL</h3>
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src="/logo.png" alt="SYNAPSE DIGITAL" className="h-7 w-auto" />
+              <h3 className="text-white text-lg font-bold">SYNAPSE DIGITAL</h3>
+            </div>
             <p className="text-sm text-gray-400">Fragancias originales seleccionadas para quienes buscan calidad, estilo y distinción.</p>
           </div>
           <div>

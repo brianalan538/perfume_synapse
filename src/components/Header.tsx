@@ -27,7 +27,7 @@ export default function Header() {
           </button>
 
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="SYNAPSE DIGITAL" className="h-8 w-auto brightness-0 invert" />
+            <img src="/logo.png" alt="SYNAPSE DIGITAL" className="h-9 w-auto" />
             <span className="text-2xl font-bold tracking-tight text-white">SYNAPSE DIGITAL</span>
           </Link>
 

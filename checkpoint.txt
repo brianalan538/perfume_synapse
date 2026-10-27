@@ -1404,6 +1404,14 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   151 RANEEN ASDAAF, 236 SALVO ELIXIR, 235 SALVO EDP, 375 MOMENTO RIIFFS, 31 CLUB DE NUIT URBAN ELIXIR, 237 FATIMA PINK, 306 BODY SPLASH COCONUT PASSION (nuevo en 0, era 1).
   NITRO RED (247) ya NO está en 0: fue repuesto a stock 12.
 
+- Actualización de Logo 2026-10-27:
+  Se reemplazó el isotipo swirl genérico por el nuevo logo de frasco de perfume (logo_2.jpg).
+  Fondo crema removido con closed-form color matting (sin halos), curvas de color calibradas
+  para dark-mode (#0f0f1a) y recorte proporcional en alta definición.
+  Actualizados: public/logo.png, src/app/favicon.ico, public/favicon.ico,
+  src/components/Header.tsx (sin filtro invert para mostrar degradé cian/ámbar) y Footer.tsx.
+  Backup preservado en public/logo-old.png.
+
   ======================  PENDIENTE =======================
 
 [ ] Custom events NO DISPONIBLES (requiere Vercel Pro). Instalar Google
