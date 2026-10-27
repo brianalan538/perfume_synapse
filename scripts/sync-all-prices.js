@@ -2,6 +2,9 @@
 // Aplica CARGO el costo del proveedor en price_wholesale y volume_options[].price_wholesale,
 // recalcula price (campo de reporte) y volume_options[].price con la fórmula actual de
 // scripts/pricing.js (markup 80.000-130.000 Gs). También actualiza stock.
+const { Agent, setGlobalDispatcher } = require('undici');
+setGlobalDispatcher(new Agent({ connect: { timeout: 60000 } }));
+
 const { createClient } = require('@supabase/supabase-js');
 const { WebSocket } = require('ws');
 const https = require('https');

@@ -1,3 +1,6 @@
+const { Agent, setGlobalDispatcher } = require('undici');
+setGlobalDispatcher(new Agent({ connect: { timeout: 60000 } }));
+
 const { createClient } = require('@supabase/supabase-js');
 const { WebSocket } = require('ws');
 const https = require('https');

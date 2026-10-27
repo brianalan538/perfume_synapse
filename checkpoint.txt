@@ -1,7 +1,7 @@
 ==========================================================
  CHECKPOINT — PERFUMES SYNAPSE DIGITAL (E-COMMERCE)
 ==========================================================
-Última actualización: 2026-09-29
+Última actualización: 2026-10-27
 
 ======================  DATOS DEL PROYECTO =======================
 
@@ -18,7 +18,7 @@ Supabase Service Role Key: EXISTE en .env.local (NO publicar en git)
 Supabase Project ID: efwdhmhuwgtmfaqbomnl
 
 Storage bucket: perfumes (imágenes en /perfumes/products/)
-   Tablas: categories (18 filas), products (264 total, 206 activas, 58 ocultas)
+   Tablas: categories (18 filas), products (279 total, 213 activas, 66 ocultas)
 
 GitHub: https://github.com/brianalan538/perfume_synapse
    - Rama: main (default). Commit inicial ya pusheado.
@@ -1081,6 +1081,328 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   temp_run.js untracked + warnings de <img> preexistentes).
   Requiere deploy (la fórmula vive en el código del frontend) → commit
   + push a main.
+
+- Catálogo WhatsApp 2026-10-08: scripts/generate-catalog-pdf.js genera
+  catalogo-synapse.pdf (A4, 73 págs, ~2 MB, 215 activos con foto/precio/
+  descripción, por secciones MASCULINOS/FEMENINOS/UNISEX, 213/215 fotos OK).
+  Regenerar con el mismo comando tras cada cambio de precios.
+
+- Audit 2026-10-11: proveedor con 1 cambio de costo (BAJA), 0 nuevos
+  perfume, 0 eliminados, 0 repuestos. 5 cosméticos ignorados (384/385
+  ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN
+  FORMOL, 413 SPRAY FIJADOR SILHOUETTE, 420 RETINAL SHOT CELIMAX, mal
+  categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido (NO se corrió sync-all-prices.js completo:
+  su fallback price→costo habría sacado de CONSULTAR a los 10 en
+  consulta — el dry-run los marcaba [SUBIO]):
+    - 1 CAMBIO DE COSTO (BAJA):
+      id 191 RAMZ GOLD (cat 3 Unisex): costo USD 14 → Gs 95.400 ->
+      85.400, venta 190.000 -> 180.000. Stock 12 (= proveedor, sin
+      cambio, producto + vols).
+    - 29 sin match verificados: los 29 ya están ocultos (0 activos).
+    - 0 REPUESTOS nuevos (los 28 ocultos que existen en el proveedor son
+      los mismos de auditorías anteriores, todos con costo idéntico → se
+      mantienen ocultos según política 2026-09-29).
+    - Stock sincronizado: nada que sincronizar (0 diffs en activos,
+      producto y vols, verificado por script).
+    - 10 en consulta siguen sin price_wholesale en proveedor (solo price
+      minorista) → se mantienen en CONSULTAR (409 + 410 + 411 + 412 +
+      414 + 415 + 111 + 419 + 422 + 423).
+  compare-prices.js post-cambios: 0 cambios de costo, 5 nuevos (solo
+  cosméticos ignorados), 29 sin match (0 activos), 10 en consulta.
+  Resultado: 272 total, 215 activas, 57 ocultas (sin cambios en
+   totales). Precio visible en frontend (vive en Supabase, sin deploy
+   necesario; sin cambios de código → sin commit).
+
+- Audit 2026-10-12: proveedor SIN cambios reales (0 nuevos perfume, 0
+  eliminados, 0 cambios de costo, 0 repuestos). 5 cosméticos ignorados
+  (384/385 ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO
+  PROGRESIVO SIN FORMOL, 413 SPRAY FIJADOR SILHOUETTE, 420 RETINAL SHOT
+  CELIMAX, mal categorizados como Femeninos por el proveedor → no
+  agregados). Verificado con compare-prices.js (0 cambios de costo,
+  5 nuevos = solo cosméticos ignorados, 29 sin match = todos ya ocultos
+  verificado 0 activos, 10 en consulta = 409 + 410 + 411 + 412 + 414 +
+  415 + 111 + 419 + 422 + 423) y sync-all-prices.js --dry-run (241 con
+  [=] costo/venta idénticos; los 10 únicos [SUBIO] son los 10 en
+  consulta por el fallback price→costo del script — todos siguen con
+  price_wholesale=null en proveedor (solo price minorista) → se
+  mantienen en CONSULTAR; NO se corrió el sync completo por esa trampa).
+  Stock producto: 0 diffs en activos (todo sincronizado, nada que
+  aplicar). Stock vols: 11 diffs, todos estructurales preexistentes sin
+  impacto (9 en CONSULTAR con vols generados 54-56 vs 1 del proveedor +
+  id 176 BLUE SEDUCTION MASC con vol fantasma 100ml stock 20 que el
+  proveedor no lista + id 278 BOTOX con 1 vol vs 2 del proveedor; el
+  sync por diseño preserva la estructura de vols de la DB, dry-run los
+  marca [=] → sin acción).
+  0 REPUESTOS nuevos (los 28 ocultos que existen en el proveedor son los
+  mismos de auditorías anteriores → se mantienen ocultos según política
+  2026-09-29).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina,
+  vigilar): 247 NITRO RED, 236 SALVO ELIXIR, 375 MOMENTO RIIFFS,
+  31 CLUB DE NUIT URBAN ELIXIR (los 4 iguales desde 2026-09-30).
+  NOTA: 406 ATEEQ NUSUK / 407 SET 9PM REBEL / 408 SET 9AM DIVE figuran
+  con costo = price minorista del proveedor (fallback, wholesale=null):
+  salieron de CONSULTAR en algún momento entre el 09-18 y el 10-08 sin
+  quedar registrado en qué auditoría; hoy el proveedor sigue sin
+  publicarles wholesale → margen real incierto (mismo caso que el lote
+  08-26).
+  Resultado: 272 total, 215 activas, 57 ocultas (sin cambios en
+  totales). Sin cambios de código ni precios visibles → sin commit
+  ni deploy (datos viven en Supabase).
+
+- Audit 2026-10-13: proveedor con 1 producto NUEVO (perfume), 0 cambios
+  de costo, 0 eliminados, 0 repuestos. 5 cosméticos ignorados (384/385
+  ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN
+  FORMOL, 413 SPRAY FIJADOR SILHOUETTE, 420 RETINAL SHOT CELIMAX, mal
+  categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido + add-new-provider.mjs (TARGET_IDS=[424],
+  reseteado a [] después; NO se corrió sync-all-prices.js completo: su
+  fallback price→costo habría sacado de CONSULTAR a los 11 en consulta
+  — el dry-run los marcaba [SUBIO]):
+    - 1 NUEVO insertado con add-new-provider.mjs (imagen subida a
+      Storage). Sin price_wholesale en proveedor → queda en CONSULTAR
+      (venta 0):
+      id 424 FREEZE IN FLAME (RIIFS, cat 3 Unisex, stock 2, 100ml)
+      Descripciones (short_description + description HTML, formato patrón
+      346, sin tildes por encoding del shell) agregadas. Notas
+      verificadas contra Fragrantica/web oficial Riiffs (frambuesa-
+      maracuya-manzana roja-bergamota Calabria-menta-acorde nevado/
+      lavanda-menta-te-salvia/cedro-almizcle-AmberXtreme, flanker frutal
+      del Freeze original).
+    - Stock sincronizado (solo /admin, sin impacto público, producto +
+      vols): id 250 HAWAS ICE 12->11, id 235 SALVO EDP 1->0 (= proveedor).
+    - 29 sin match verificados: los 29 ya están ocultos (0 activos).
+    - 0 REPUESTOS nuevos (los 28 ocultos que existen en el proveedor son
+      los mismos de auditorías anteriores → se mantienen ocultos según
+      política 2026-09-29).
+    - 10 en consulta previos siguen sin price_wholesale en proveedor →
+      se mantienen en CONSULTAR.
+  compare-prices.js post-cambios: 0 cambios de costo, 5 nuevos (solo
+  cosméticos ignorados), 29 sin match (0 activos), 11 en consulta.
+  Resultado: 273 total, 216 activas, 57 ocultas. Precios y descripciones
+  visibles en frontend (viven en Supabase, sin deploy necesario; sin
+  cambios de código → sin commit).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina,
+  vigilar): 247 NITRO RED, 236 SALVO ELIXIR, 375 MOMENTO RIIFFS,
+  31 CLUB DE NUIT URBAN ELIXIR (los 4 iguales desde 2026-09-30) + 235
+  SALVO EDP (nuevo en 0, era 1).
+
+- Audit 2026-10-16: proveedor con 2 cambios de costo (BAJAS), 2 REPUESTOS
+  con cambio de costo (2 SUBIDAS) y 0 ELIMINADOS. 7 cosméticos ignorados
+  (384/385 ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO
+  SIN FORMOL, 413 SPRAY FIJADOR SILHOUETTE, 420 RETINAL SHOT CELIMAX +
+  425 ZERO PORE PAD MEDICUBE y 426 PDRN PINK COLLAGEN MEDICUBE nuevos
+  cosméticos/skincare, mal categorizados como Femeninos por el proveedor
+  → no agregados).
+  Aplicado con update dirigido (NO se corrió sync-all-prices.js completo:
+  su fallback price→costo habría sacado de CONSULTAR a los 11 en
+  consulta — el dry-run los marcaba [SUBIO]):
+    - 2 CAMBIOS DE COSTO en activos (BAJAS):
+      id 1 ASAD BLACK: costo USD 26 → Gs 165.000 -> 158.600,
+      venta 275.000 -> 265.000. Stock 27->12 (= proveedor).
+      id 359 FAHAD: costo USD 34 → Gs 219.600 -> 207.400,
+      venta 335.000 -> 320.000. Stock 20->19 (= proveedor).
+    - 2 REPUESTOS (estaban ocultos, volvieron al catálogo del proveedor
+      con costo nuevo), restaurados con is_active=true + costo/venta/
+      stock actualizados (stock sano, según política 2026-09-29):
+      SUBIDA: id 54 ASAD BOURBON: costo USD 35 → Gs 207.400 ->
+      213.500, venta 320.000 -> 330.000. Stock 12 (= proveedor).
+      SUBIDA: id 67 LATTAFA HAYAATI FLORENCE EDP: costo USD 19 → Gs
+      85.400 -> 115.900, venta 180.000 -> 215.000. Stock 19 (= proveedor).
+    - Stock sincronizado (solo /admin, sin impacto público, producto +
+      vols; el script barrió 201 filas pero solo 12 con cambio real):
+      id 377 BETWEEN US 2->1, id 402 FREEZE 3->2, id 24 CLUB DE NUIT
+      INTENSE MAN 17->16, id 312 BODY SPLASH LOVE SPELL 12->11,
+      id 114 BEACH PARTY 19->18, id 124 ODYSSEY HOMME 20->18,
+      id 135 SABAH AL WARD 11->8, id 151 RANEEN ASDAAF 1->0,
+      id 140 DURRAT AL AROOS 14->13, id 232 PHILOS PURA 11->9,
+      id 308 BODY SPLASH VELVET PETALS 12->11,
+      id 311 BODY SPLASH PURE SEDUCTION 12->10 (todos = proveedor).
+    - 28 sin match verificados: los 28 ya están ocultos (0 activos).
+    - 0 REPUESTOS nuevos además de 54/67 (los otros 27 ocultos que
+      existen en el proveedor tienen costo idéntico → se mantienen
+      ocultos según política 2026-09-29).
+    - 11 en consulta siguen sin price_wholesale en proveedor (solo price
+      minorista) → se mantienen en CONSULTAR (409 + 410 + 411 + 412 +
+      414 + 415 + 111 + 419 + 422 + 423 + 424).
+  compare-prices.js post-cambios: 0 cambios de costo, 7 nuevos (solo
+  cosméticos ignorados), 28 sin match (0 activos), 11 en consulta.
+  Resultado: 273 total, 218 activas (+2), 55 ocultas (-2). Precios
+  visibles en frontend (viven en Supabase, sin deploy necesario; sin
+  cambios de código → sin commit).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina,
+  vigilar): 151 RANEEN ASDAAF (nuevo en 0, era 1), 247 NITRO RED,
+  236 SALVO ELIXIR, 375 MOMENTO RIIFFS, 31 CLUB DE NUIT URBAN ELIXIR,
+  235 SALVO EDP (los 5 iguales desde 2026-09-30/10-13).
+
+- Audit 2026-10-19: proveedor con 5 productos NUEVOS (perfumes), 1 cambio
+  de costo (SUBIDA), 2 cambios de stock, 0 eliminados, 0 repuestos. 7 cosméticos
+  ignorados (384/385 ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO
+  PROGRESIVO SIN FORMOL, 413 SPRAY FIJADOR SILHOUETTE, 420 RETINAL SHOT
+  CELIMAX, 425 ZERO PORE PAD MEDICUBE, 426 PDRN PINK COLLAGEN MEDICUBE,
+  mal categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con add-new-provider.mjs (TARGET_IDS=[427, 428, 429, 430, 431],
+  reseteado a [] después) + update dirigido:
+    - 5 NUEVOS insertados con add-new-provider.mjs (imágenes subidas a Storage).
+      Sin price_wholesale en proveedor → quedan en CONSULTAR (venta 0):
+      id 427 AMSTERDAM (STELLA DUSTIN, cat 1 Masculinos, 30ml, stock 6)
+      id 428 HAWAS REINA (RASASI, cat 2 Femeninos, 100ml, stock 3)
+      id 429 HAWAS THUNDER (RASASI, cat 1 Masculinos, 100ml, stock 3)
+      id 430 KAAF Ahmed Al Maghribi (KAAF, cat 1 Masculinos, 100ml, stock 3)
+      id 431 RED VELVET (ARMAF, cat 2 Femeninos, 100ml, stock 3)
+      Descripciones (short_description + description HTML, formato patrón 346,
+      sin tildes por encoding del shell) agregadas a los 5. Notas verificadas
+      contra Fragrantica/web oficial (Amsterdam: bergamota-canela-cardamomo/
+      azahar-guayaco/vainilla-tonka-ámbar; Hawas Reina: albaricoque-pera-canela/
+      jazmín-frangipani-azahar-coco-café/vainilla-azúcar tostado-almizcle-sándalo-ámbar;
+      Hawas Thunder: manzana-bergamota-jengibre-mandarina-cedro/especias-mate-peonía-
+      azahar-pachulí/ámbar gris-tonka-vainilla-cedro-almizcle; Kaaf: sandía-frutos
+      rojos-lavanda-naranja/marinas-lirio-jazmín-loto/ambroxan-almizcle-sándalo;
+      Red Velvet: fresa-limón/crema batida-azúcar-frangipani/vainilla-ámbar-almizcle).
+    - 1 CAMBIO DE COSTO (SUBIDA):
+      id 376 MENDOZA: costo 60.000 -> 75.000, venta 150.000 -> 170.000.
+    - Stock sincronizado (solo /admin, sin impacto público, producto + vols):
+      id 424 FREEZE IN FLAME 2->1, id 237 FATIMA PINK 1->0 (= proveedor).
+    - 28 sin match verificados: los 28 ya están ocultos (0 activos).
+    - 0 REPUESTOS nuevos (los 27 ocultos que existen en el proveedor son los
+      mismos de auditorías anteriores → se mantienen ocultos según política 2026-09-29).
+    - 11 en consulta previos siguen sin price_wholesale en proveedor → se
+      mantienen en CONSULTAR (total ahora 16 en consulta).
+  compare-prices.js post-cambios: 0 cambios de costo, 7 nuevos (solo cosméticos
+  ignorados), 28 sin match (0 activos), 16 en consulta.
+  Resultado: 278 total (+5), 223 activas (+5), 55 ocultas. Precios y
+  descripciones visibles en frontend (viven en Supabase, sin deploy necesario).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina, vigilar):
+  237 FATIMA PINK (nuevo en 0, era 1), 151 RANEEN ASDAAF, 247 NITRO RED,
+  236 SALVO ELIXIR, 235 SALVO EDP, 375 MOMENTO RIIFFS, 31 CLUB DE NUIT URBAN ELIXIR.
+
+- Audit 2026-10-21: OLA GRANDE DE CAMBIOS. El proveedor reimportó ~78 productos
+  el 19-20 oct (created_at nuevo) con ajustes de costo. Resultado: 1 producto
+  NUEVO (perfume), 59 cambios de costo (16 SUBIDAS + 43 BAJADAS), 4 productos
+  salieron de CONSULTAR (publicaron price_wholesale), 7 ELIMINADOS y 1 REPUESTO.
+  7 cosméticos ignorados (384/385 ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS
+  ALISADO PROGRESIVO SIN FORMOL, 413 SPRAY FIJADOR SILHOUETTE, 420 RETINAL SHOT
+  CELIMAX, 425 ZERO PORE PAD MEDICUBE, 426 PDRN PINK COLLAGEN MEDICUBE, mal
+  categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido (NO se corrió sync-all-prices.js completo: su
+  fallback price→costo habría sacado de CONSULTAR a los 12 restantes — el
+  dry-run los marcaba [SUBIO]) + add-new-provider.mjs (TARGET_IDS=[432],
+  reseteado a [] después):
+    - 1 NUEVO insertado con add-new-provider.mjs (imagen subida a Storage):
+      id 432 AETHER EXTRAIT (FRENCH AVENUE, cat 1 Masculinos, 100ml, stock 3):
+      costo USD 34.5 → Gs 210.450, venta 325.000.
+      Descripciones (short_description + description HTML, formato patrón 346,
+      sin tildes por encoding del shell) agregadas. Notas verificadas contra
+      Fragrantica/web oficial French Avenue (manzana verde-bergamota-mandarina/
+      cedro-petitgrain-cashmeran-violeta/musgo de roble-almizcle-maderas
+      ambaradas, aromática frutal 2024, inspirada en PDM Greenley).
+    - 4 que salieron de CONSULTAR (publicaron price_wholesale):
+      id 419 RAYHAAN AZUL:            costo USD 28.5 → Gs 173.850, venta 285.000
+      id 428 HAWAS REINA:             costo USD 39   → Gs 237.900, venta 360.000
+      id 429 HAWAS THUNDER:           costo USD 50   → Gs 305.000, venta 435.000
+      id 415 ATLAS (LATTAFA):         costo USD 26   → Gs 158.600, venta 265.000
+    - 59 CAMBIOS DE COSTO aplicados con update dirigido (costo + venta + vols +
+      stock), misma lógica del sync:
+      SUBIDAS activas (13): 45 Bade'e Al Oud Sublime 118.950→149.450 (220→255),
+        123 ODYSSEY AQUA 149.450→152.500 (255→260), 135 SABAH AL WARD
+        106.750→109.800 (205→210), 136 SABAH AL WARD SUGAR 97.600→100.650
+        (195→195), 161 HAYAATI LATTAFA 97.600→100.650 (195→195), 185 Bade'e Al
+        Oud for Glory 109.800→112.850 (210→210), 196 THE KINGDOM FEMME
+        140.300→146.400 (245→250), 197 THE KINGDOM EDP 140.300→146.400
+        (245→250), 209 MUSAMAN WHITE 201.300→213.500 (315→330), 269 QIMMAH
+        WOMEN 91.500→97.600 (185→195), 56 LATTAFA KHAMRAH EDP 152.500→167.750
+        (260→275), 62 Bade'e Noble Blush 146.400→152.500 (250→260), 63 YARA
+        CANDY 125.050→152.500 (225→260).
+      SUBIDAS ocultas (3): 214 CONFIDENTIAL GOLD 112.850→134.200 (210→235),
+        210 NEBRAS 173.850→179.950 (285→290), 180 LATTAFA KHAMRAH DUKHAN
+        122.000→134.200 (220→235).
+      BAJADAS activas (37): 1 ASAD BLACK 158.600→146.400 (265→250), 41 YARA
+        ELIXIR 176.900→149.450 (285→255), 54 ASAD BOURBON 213.500→204.350
+        (330→320), 55 LATTAFA FAKHAR MEN 146.400→143.350 (250→245), 68 ARMAF
+        ODYSSEY CANDEE 112.850→109.800 (210→210), 78 ARMAF ODYSSEY LIMONI
+        125.050→118.950 (225→220), 82 ARMAF ODYSSEY BAHAMAS 137.250→115.900
+        (240→215), 83 MAYAR ROSA 122.000→112.850 (220→210), 138 SABAH AL WARD
+        VALENTINE 131.150→112.850 (235→210), 139 SABAH AL WARD DELILAH
+        131.150→112.850 (235→210), 141 LATTAFA KHAMRAH WAHA 256.200→213.500
+        (380→330), 145 LIQUID BRUN 234.850→228.750 (355→345), 146 VULCAN FEU
+        231.800→225.700 (350→345), 159 ANSAAM SILVER 143.350→140.300 (245→245),
+        179 ASAD ELIXIR 192.150→189.100 (305→300), 181 SAKEENA 122.000→118.950
+        (220→220), 183 ANGHAM SECOND SONG 152.500→137.250 (260→240), 193
+        ECLAIRE PISTACHE 164.700→158.600 (270→265), 202 ISHQ AL SHUYUKH SILVER
+        146.400→140.300 (250→245), 204 SHAHEEN SILVER 134.200→128.100
+        (235→230), 207 MAHIR LEGACY 137.250→134.200 (240→235), 251 HAWAS KOBRA
+        176.900→173.850 (285→285), 253 HAWAS VERDE 231.800→210.450 (350→325),
+        262 RAYHAAN ELIXIR 161.650→149.450 (270→255), 268 VICTORIA EDP
+        161.650→149.450 (270→255), 274 9PM REBEL 240.950→234.850 (360→355),
+        341 WINNER'S TROPHY SILVER 143.350→137.250 (245→240), 345 ODYSSEY
+        MARSHMALLOW 128.100→115.900 (230→215), 350 RAYHAAN PACIFIC AURA
+        195.000→155.550 (310→260), 351 RAYHAAN CORIUM 152.500→146.400
+        (260→250), 352 CALIFORNIA BLUE 120.000→112.850 (220→210), 354 INVADE
+        115.900→112.850 (215→210), 355 SHAGAF AL WARD 115.000→106.750
+        (215→205), 356 JOURI LATTAFA 170.000→146.400 (280→250), 359 FAHAD
+        207.400→201.300 (320→315), 361 BLACK EXPOSED 240.000→195.200 (360→310),
+        373 MAHIR HONOR 155.550→149.450 (260→255).
+      BAJADAS ocultas (6): 47 Honor And Glory 125.050→115.900 (225→215), 61
+        HAYA EDP 161.650→149.450 (270→255), 166 LATTAFA FAKHAR ROSE
+        164.700→149.450 (270→255), 260 ATTAR AL WESAL GOLD 176.900→122.000
+        (285→220), 347 HAWAS CHROME 237.900→222.650 (360→340), 147 SPECTRE
+        GOHTST 245.000→207.400 (365→320).
+    - 1 REPUESTO restaurado con is_active=true (creado por el proveedor el
+      2026-10-20, stock 1): id 147 SPECTRE GOHTST (FRENCH AVENUE, cat 1),
+      costo 207.400, venta 320.000. Se agregó short_description (ya tenía
+      description).
+    - 7 ELIMINADOS del proveedor (verificados uno por uno con
+      /public/products/{id} → 404: no existen en ninguna categoría) ocultados
+      con is_active=false (soft delete): id 77 LATTAFA HAYAATI AL MALEKY EDP,
+      id 110 TURATHI BLEU - AFNAN, id 164 LATTAFA FAKHAR PLATIN, id 190 RAMZ
+      SILVER, id 199 ART OF UNIVERSE, id 203 DREAM OF HAZE, id 314 OBSIDIAN -
+      RAYHAAN.
+    - Stock sincronizado (solo /admin, sin impacto público): id 99 9PM NIGTH
+      OUT 10→9, id 428 HAWAS REINA 3→5 (además de los 59 productos con cambio
+      de costo, cuyos stocks quedaron = proveedor).
+    - Los otros 28 ocultos que existen en el proveedor se mantienen ocultos
+      según política 2026-09-29 (no son delta de esta auditoría).
+    - 12 siguen en CONSULTAR sin price_wholesale (solo price minorista):
+      111, 409, 410, 411, 412, 414, 422, 423, 424, 427, 430, 431.
+  compare-prices.js post-cambios: 0 cambios de costo, 7 nuevos (solo cosméticos
+  ignorados 384/385/386/413/420/425/426), 32 sin match (0 activos), 12 en
+  consulta.
+  Resultado: 279 total (+1), 218 activas (-5), 61 ocultas (+6). Precios y
+  descripciones visibles en frontend (viven en Supabase, sin deploy necesario;
+  sin cambios de código → sin commit).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina, vigilar):
+  151 RANEEN ASDAAF, 247 NITRO RED, 236 SALVO ELIXIR, 235 SALVO EDP,
+  375 MOMENTO RIIFFS, 31 CLUB DE NUIT URBAN ELIXIR, 237 FATIMA PINK.
+
+- Audit 2026-10-27: proveedor con 8 cambios de costo (todas BAJADAS: 7 en activos + 1 en oculto), 5 ELIMINADOS del catálogo y 13 cambios de stock en activos. 0 nuevos perfumes (7 cosméticos ignorados: 384/385 ALISADO SALON GOLD 0% FORMOL, 386 LUMINOLISS ALISADO PROGRESIVO SIN FORMOL, 413 SPRAY FIJADOR SILHOUETTE, 420 RETINAL SHOT CELIMAX, 425 ZERO PORE PAD MEDICUBE, 426 PDRN PINK COLLAGEN MEDICUBE, mal categorizados como Femeninos por el proveedor → no agregados).
+  Aplicado con update dirigido + compare-prices/sync-all-prices parcheados con undici Agent timeout 60s para mitigar timeouts de TLS:
+    - 8 CAMBIOS DE COSTO (BAJADAS):
+      7 activos con precio de venta reducido en el frontend:
+        id 357 HAWAS DIVA:        costo USD 35.0 → 33.0 (Gs 213.500 -> 201.300), venta 330.000 -> 315.000 (stock 9)
+        id 362 ISLAND KHADLAJ:    costo USD 30.0 → 26.5 (Gs 183.000 -> 161.650), venta 295.000 -> 270.000 (stock 2)
+        id 250 HAWAS ICE:         costo USD 32.0 → 29.0 (Gs 195.200 -> 176.900), venta 310.000 -> 285.000 (stock 11)
+        id 71  HAWAS FOR HIM EDP: costo USD 23.0 → 22.0 (Gs 140.300 -> 134.200), venta 245.000 -> 235.000 (stock 11)
+        id 255 HAWAS ELIXIR:      costo USD 28.0 → 26.0 (Gs 170.800 -> 158.600), venta 280.000 -> 265.000 (stock 12)
+        id 252 HAWAS MALIBU:      costo USD 27.5 → 27.0 (Gs 167.750 -> 164.700), venta 275.000 -> 270.000 (stock 17)
+        id 251 HAWAS KOBRA:       costo USD 28.5 → 28.0 (Gs 173.850 -> 170.800), venta 285.000 -> 280.000 (stock 12)
+      1 oculto con costo actualizado (se mantiene oculto):
+        id 347 HAWAS CHROME:      costo USD 36.5 → 35.5 (Gs 222.650 -> 216.550), venta 340.000 -> 335.000 (stock 20)
+    - 5 ELIMINADOS del proveedor (verificados uno por uno con /public/products/{id} → 404: no existen en ninguna categoría) ocultados con is_active=false (soft delete):
+      id 407 SET 9PM REBEL, id 408 SET 9AM DIVE, id 272 SET THE KINGDOM, id 248 HAWAS FIRE, id 161 HAYAATI LATTAFA.
+    - 13 cambios de stock sincronizados en activos (producto + volume_options):
+      id 352 CALIFORNIA BLUE (2->6), id 119 ODYSSEY MANDARIN SKY (14->13), id 124 ODYSSEY HOMME (18->17),
+      id 135 SABAH AL WARD (8->6), id 149 AMEER IMPERIUM ASDAAF (4->3), id 247 NITRO RED (repuesto 0->12),
+      id 306 BODY SPLASH COCONUT PASSION (1->0), id 308 BODY SPLASH VELVET PETALS (11->10),
+      id 307 BODY SPLASH AQUA KISS (12->11), id 311 BODY SPLASH PURE SEDUCTION (10->9),
+      id 57 LATTAFA KHAMRAH QAHWA (3->2), id 403 NITRO RED INTENSELY (2->12), id 411 STALLION 53 (3->2).
+    - Los 28 ocultos que existen en el proveedor se mantienen ocultos según política 2026-09-29.
+    - 12 siguen en CONSULTAR sin price_wholesale en proveedor (solo price minorista):
+      111, 409, 410, 411, 412, 414, 422, 423, 424, 427, 430, 431.
+  compare-prices.js post-cambios: 0 cambios de costo, 7 nuevos (solo cosméticos ignorados), 38 sin match (todos ya ocultos, 0 activos), 12 en consulta.
+  Resultado: 279 total, 213 activas (-5), 66 ocultas (+5). Precios y stocks visibles en frontend en vivo desde Supabase (sin deploy necesario).
+  Activos con stock 0 en proveedor (se dejan visibles según rutina, vigilar):
+  151 RANEEN ASDAAF, 236 SALVO ELIXIR, 235 SALVO EDP, 375 MOMENTO RIIFFS, 31 CLUB DE NUIT URBAN ELIXIR, 237 FATIMA PINK, 306 BODY SPLASH COCONUT PASSION (nuevo en 0, era 1).
+  NITRO RED (247) ya NO está en 0: fue repuesto a stock 12.
 
   ======================  PENDIENTE =======================
 
