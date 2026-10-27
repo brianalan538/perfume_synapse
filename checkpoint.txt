@@ -1412,6 +1412,15 @@ FIX EN VERCEL (Project Settings > Environment Variables):
   src/components/Header.tsx (sin filtro invert para mostrar degradé cian/ámbar) y Footer.tsx.
   Backup preservado en public/logo-old.png.
 
+- Optimización de Carga e Imágenes 2026-10-27:
+  Diagnóstico: fondo hero-bg.jpg era un PNG de 1.85 MB cargado por inline CSS desde Supabase con Cache-Control no-cache;
+  las imágenes de productos usaban <img> crudo sin CDN ni conversión moderna, y /products dependía de un fetch en useEffect.
+  Solución aplicada:
+  1. hero-bg comprimido a WebP (128 KB, -93%), servido localmente y precargado con <Image priority fill>.
+  2. next/image configurado en next.config.ts (remotePatterns de Supabase) para auto-optimización a WebP/AVIF y CDN caching global (1 año de caché).
+  3. ProductCard y ProductDetail migrados a next/image con responsive sizes.
+  4. /products migrado a SSR (pasa initialProducts e initialCategories directamente en HTML sin pantalla de "Cargando...").
+
   ======================  PENDIENTE =======================
 
 [ ] Custom events NO DISPONIBLES (requiere Vercel Pro). Instalar Google

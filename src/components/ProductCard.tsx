@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingCart, Check, MessageCircle } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { calculateSalePrice } from '@/lib/data';
@@ -67,14 +68,16 @@ export default function ProductCard({ product }: Props) {
         className="block"
       >
         <div className="aspect-square bg-gray-50 relative overflow-hidden">
-          <img
+          <Image
             src={imgSrc}
             alt={product.name}
-            className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-contain p-4 group-hover:scale-105 transition-transform"
             loading="lazy"
           />
           {product.brand && (
-            <span className="absolute top-2 left-2 bg-[#7c3aed] text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="absolute top-2 left-2 bg-[#7c3aed] text-white text-xs font-medium px-2 py-1 rounded z-10">
               {product.brand}
             </span>
           )}

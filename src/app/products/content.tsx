@@ -1,25 +1,22 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
-import { getProducts, getCategories } from '@/lib/data';
 import type { Product, Category } from '@/lib/types';
 
-export default function ProductsContent() {
+interface Props {
+  initialProducts: Product[];
+  initialCategories: Category[];
+}
+
+export default function ProductsContent({ initialProducts, initialCategories }: Props) {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [search, setSearch] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    Promise.all([getProducts(), getCategories()]).then(([p, c]) => {
-      setProducts(p);
-      setCategories(c);
-    });
-  }, []);
+  const [products] = useState<Product[]>(initialProducts || []);
+  const [categories] = useState<Category[]>(initialCategories || []);
 
   const filtered = useMemo(() => {
     let result = products;

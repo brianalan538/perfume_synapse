@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ShoppingCart, ChevronLeft, Check, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { calculateSalePrice } from '@/lib/data';
 import { useCart } from '@/store/cart';
 import { track } from '@vercel/analytics';
@@ -77,8 +78,15 @@ export default function ProductDetail({ product }: { product: Product }) {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="aspect-square bg-gray-50 rounded-xl overflow-hidden">
-          <img src={imgSrc} alt={product.name} className="w-full h-full object-contain p-8" />
+        <div className="aspect-square bg-gray-50 rounded-xl overflow-hidden relative">
+          <Image
+            src={imgSrc}
+            alt={product.name}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-contain p-8"
+          />
         </div>
 
         <div>
