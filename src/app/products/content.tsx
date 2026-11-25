@@ -3,7 +3,16 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
+import { calculateSalePrice } from '@/lib/data';
 import type { Product, Category } from '@/lib/types';
+
+function effectivePrice(product: Product): number {
+  const volumeOption = product.volume_options?.[0];
+  const wholesale = volumeOption
+    ? (volumeOption.price_wholesale > 0 ? volumeOption.price_wholesale : volumeOption.price)
+    : (product.price_wholesale > 0 ? product.price_wholesale : product.price);
+  return calculateSalePrice(wholesale);
+}
 
 interface Props {
   initialProducts: Product[];
@@ -15,6 +24,7 @@ export default function ProductsContent({ initialProducts, initialCategories }: 
   const initialQuery = searchParams.get('q') || '';
   const [search, setSearch] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [sort, setSort] = useState('');
   const [products] = useState<Product[]>(initialProducts || []);
   const [categories] = useState<Category[]>(initialCategories || []);
 
@@ -30,8 +40,21 @@ export default function ProductsContent({ initialProducts, initialCategories }: 
     if (selectedCategory) {
       result = result.filter(p => String(p.category_id) === selectedCategory);
     }
+    if (sort === 'asc') {
+      result = [...result].sort((a, b) => {
+        const pa = effectivePrice(a);
+        const pb = effectivePrice(b);
+        return (pa <= 0 ? Infinity : pa) - (pb <= 0 ? Infinity : pb);
+      });
+    } else if (sort === 'desc') {
+      result = [...result].sort((a, b) => {
+        const pa = effectivePrice(a);
+        const pb = effectivePrice(b);
+        return (pb <= 0 ? -Infinity : pb) - (pa <= 0 ? -Infinity : pa);
+      });
+    }
     return result;
-  }, [search, selectedCategory, products]);
+  }, [search, selectedCategory, sort, products]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -54,6 +77,15 @@ export default function ProductsContent({ initialProducts, initialCategories }: 
           {categories.map(cat => (
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
+        </select>
+        <select
+          value={sort}
+          onChange={e => setSort(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7c3aed]"
+        >
+          <option value="">Ordenar por precio</option>
+          <option value="asc">Menor a mayor</option>
+          <option value="desc">Mayor a menor</option>
         </select>
       </div>
 
