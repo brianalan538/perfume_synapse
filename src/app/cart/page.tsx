@@ -50,7 +50,7 @@ export default function CartPage() {
           const key = `${item.product_id}-${item.selected_flavor || ''}-${item.selected_volume?.ml || ''}`;
           const imgSrc = item.image_url
             ? (item.image_url.startsWith('http') ? item.image_url : `/images/${item.image_url}`)
-            : '/placeholder.svg';
+            : '/placeholder.png';
 
           return (
             <div key={key} className="flex items-center gap-4 bg-white border border-gray-100 rounded-xl p-4">

@@ -27,7 +27,7 @@ export default function ProductCard({ product }: Props) {
 
   const imgSrc = product.image_url
     ? (product.image_url.startsWith('http') ? product.image_url : `/images/${product.image_url}`)
-    : '/placeholder.svg';
+    : '/placeholder.png';
 
   const volumeOption = product.volume_options?.[0] ?? null;
   const wholesale = volumeOption

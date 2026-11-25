@@ -120,7 +120,7 @@ export default function AdminProductForm({ mode, initial, categories, password, 
 
   const imgSrc = draft.image_url
     ? (draft.image_url.startsWith('http') ? draft.image_url : `/images/${draft.image_url}`)
-    : '/placeholder.svg';
+    : '/placeholder.png';
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4 py-6" onClick={() => !saving && onClose()}>

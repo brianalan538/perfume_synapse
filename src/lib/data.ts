@@ -140,6 +140,6 @@ function parseProduct(raw: Record<string, unknown>): Product {
 }
 
 export function getImageUrl(imagePath: string | null): string {
-  if (!imagePath) return '/placeholder.svg';
+  if (!imagePath) return '/placeholder.png';
   return imagePath;
 }

@@ -195,7 +195,7 @@ export default function AdminPage() {
   }
 
   function getImgSrc(product: Product) {
-    if (!product.image_url) return '/placeholder.svg';
+    if (!product.image_url) return '/placeholder.png';
     return product.image_url.startsWith('http') ? product.image_url : `/images/${product.image_url}`;
   }
 

@@ -180,7 +180,7 @@ export default function ProductDetail({ product }: { product: Product }) {
 }
 
 function getStoredImg(url: string | null): string {
-  if (!url) return '/placeholder.svg';
+  if (!url) return '/placeholder.png';
   if (url.startsWith('http')) return url;
   return `/images/${url}`;
 }
